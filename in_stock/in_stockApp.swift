@@ -1,17 +1,16 @@
-//
-//  in_stockApp.swift
-//  in_stock
-//
-//  Created by user0779 on 2026/5/22.
-//
-
 import SwiftUI
+import Combine
 
 @main
-struct in_stockApp: App {
+struct InStockApp: App {
+    @StateObject var authViewModel = AuthViewModel()
+    @StateObject var appViewModel = AppViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(authViewModel)
+                .environmentObject(appViewModel)
         }
     }
 }
