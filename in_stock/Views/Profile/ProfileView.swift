@@ -5,48 +5,54 @@ struct ProfileView: View {
     @ObservedObject var appViewModel: AppViewModel
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 32) {
-                // Header
-                HStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Hi, \(authViewModel.currentUserName)")
-                            .font(AppTheme.titleFont)
-                        Text(authViewModel.currentUserEmail)
-                            .font(AppTheme.captionFont)
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 32) {
+                    // Header
+                    HStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Hi, \(authViewModel.currentUserName)")
+                                .font(AppTheme.titleFont)
+                            Text(authViewModel.currentUserEmail)
+                                .font(AppTheme.captionFont)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 60))
                             .foregroundColor(.gray)
                     }
-                    Spacer()
-                    Image(systemName: "person.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundColor(.gray)
-                }
-                .padding(.horizontal)
-                
-                // Settings List
-                VStack(spacing: 0) {
-                    SettingsRow(icon: "person.fill", title: "個人資料")
-                    Divider().padding(.leading, 56)
-                    SettingsRow(icon: "gearshape.fill", title: "設定")
-                    Divider().padding(.leading, 56)
-                    Button(action: { authViewModel.logout() }) {
-                        SettingsRow(icon: "rectangle.portrait.and.arrow.right", title: "登出", color: .red)
-                    }
-                }
-                .background(Color.white)
-                .cornerRadius(AppTheme.cornerRadius)
-                .overlay(RoundedRectangle(cornerRadius: AppTheme.cornerRadius).stroke(AppTheme.borderColor, lineWidth: 1))
-                .padding(.horizontal)
-                
-                // Achievements
-                AchievementView(achievements: appViewModel.achievements)
                     .padding(.horizontal)
-                
-                Spacer(minLength: 100)
+                    
+                    // Settings List
+                    VStack(spacing: 0) {
+                        SettingsRow(icon: "person.fill", title: "個人資料")
+                        Divider().padding(.leading, 56)
+                        
+                        NavigationLink(destination: AchievementView(viewModel: appViewModel)) {
+                            SettingsRow(icon: "trophy.fill", title: "斷捨離成就", color: .orange)
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Divider().padding(.leading, 56)
+                        SettingsRow(icon: "gearshape.fill", title: "設定")
+                        Divider().padding(.leading, 56)
+                        Button(action: { authViewModel.logout() }) {
+                            SettingsRow(icon: "rectangle.portrait.and.arrow.right", title: "登出", color: .red)
+                        }
+                    }
+                    .background(Color.white)
+                    .cornerRadius(AppTheme.cornerRadius)
+                    .overlay(RoundedRectangle(cornerRadius: AppTheme.cornerRadius).stroke(AppTheme.borderColor, lineWidth: 1))
+                    .padding(.horizontal)
+                    
+                    Spacer(minLength: 100)
+                }
+                .padding(.top, 20)
             }
-            .padding(.top, 20)
+            .navigationTitle("個人帳戶")
+            .background(AppTheme.backgroundColor)
         }
-        .background(AppTheme.backgroundColor)
     }
 }
 

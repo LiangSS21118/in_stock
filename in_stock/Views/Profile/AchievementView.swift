@@ -1,74 +1,78 @@
 import SwiftUI
 
 struct AchievementView: View {
-    let achievements: [Achievement]
+    @ObservedObject var viewModel: AppViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            Text("我的成就")
-                .font(AppTheme.headerFont)
-            
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3), spacing: 10) {
-                ForEach(achievements) { ach in
-                    VStack(spacing: 10) {
-                        Image(systemName: ach.iconName)
-                            .font(.system(size: 24))
-                        VStack(spacing: 4) {
-                            Text(ach.title)
-                                .font(AppTheme.captionFont)
-                                .foregroundColor(.gray)
-                                .multilineTextAlignment(.center)
-                            Text("\(formattedValue(ach.value)) \(ach.unit)")
-                                .font(AppTheme.headerFont)
-                                .minimumScaleFactor(0.75)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 118)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1))
-                }
-            }
-            
-            // Milestone
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    Image(systemName: "trophy.fill")
-                        .foregroundColor(.orange)
-                    Text("下一個里程碑")
-                        .font(AppTheme.bodyFont.bold())
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("再斷捨離 22 件，解鎖新成就！")
-                            .font(AppTheme.captionFont)
-                        Spacer()
-                        Text("128 / 150 件")
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                // Header Illustration (ASCII Trophy)
+                VStack(spacing: 8) {
+                    Text("""
+                                 ___________
+                                '._==_==_=_.'
+                                .-\\:      /-.
+                               | (|:.     |) |
+                                '-|:.     |-'
+                                  \\::.    /
+                                   '::. .'
+                                     ) (
+                                   _.' '._
+                                  `-------`
+                    """)
+                    .font(.system(size: 14, weight: .bold, design: .monospaced))
+                    .foregroundColor(AppTheme.primaryText)
                     
-                    ProgressView(value: 128, total: 150)
-                        .tint(.black)
-                        .background(Color.gray.opacity(0.2))
-                        .scaleEffect(x: 1, y: 2, anchor: .center)
-                        .cornerRadius(2)
+                    Text("斷捨離成就")
+                        .font(AppTheme.titleFont)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                
+                // Item Grid
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    ForEach(viewModel.doneDeclutterItems) { item in
+                        DoneDeclutterCard(item: item)
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer(minLength: 40)
             }
-            .padding(20)
-            .background(Color.white)
-            .cornerRadius(AppTheme.cornerRadius)
-            .overlay(RoundedRectangle(cornerRadius: AppTheme.cornerRadius).stroke(AppTheme.borderColor, lineWidth: 1))
+            .padding(.top, 20)
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .background(AppTheme.backgroundColor)
     }
+}
+
+struct DoneDeclutterCard: View {
+    let item: DeclutterItem
     
-    private func formattedValue(_ value: Double) -> String {
-        if value == floor(value) {
-            return String(format: "%.0f", value)
-        } else {
-            return String(format: "%.1f", value)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(item.imageName)
+                .font(.system(size: 40))
+                .padding(.bottom, 4)
+            
+            Text(item.name)
+                .font(AppTheme.bodyFont)
+                .fontWeight(.bold)
+                .foregroundColor(AppTheme.primaryText)
+                .lineLimit(1)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.reason)
+                    .font(AppTheme.captionFont)
+                    .foregroundColor(AppTheme.secondaryText)
+                    .lineLimit(1)
+                
+                Text(AppDateFormatter.shortMonthDayString(from: item.createdAt))
+                    .font(AppTheme.captionFont)
+                    .foregroundColor(AppTheme.secondaryText.opacity(0.7))
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .stickerStyle()
     }
 }

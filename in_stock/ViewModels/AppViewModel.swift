@@ -14,6 +14,7 @@ class AppViewModel: ObservableObject {
     @Published var declutterTodos: [ShoppingListItem] = MockData.shared.declutterTodos
     @Published var notifications: [NotificationItem] = MockData.shared.notifications
     @Published var declutterItems: [DeclutterItem] = MockData.shared.declutterItems
+    @Published var doneDeclutterItems: [DeclutterItem] = MockData.shared.doneDeclutterItems
     @Published var achievements: [Achievement] = MockData.shared.achievements
     @Published var pendingAddSpaceId: UUID?
 

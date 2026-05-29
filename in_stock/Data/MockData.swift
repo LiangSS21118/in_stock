@@ -80,6 +80,19 @@ struct MockData {
             DeclutterItem(name: "加濕器", imageName: "💧", locationText: "客廳 / 櫃子", action: .discard, reason: "損壞")
         ]
     }
+
+    var doneDeclutterItems: [DeclutterItem] {
+        [
+            DeclutterItem(name: "老舊筆電", imageName: "💻", locationText: "回收中心", action: .discard, reason: "已報廢"),
+            DeclutterItem(name: "過期雜誌", imageName: "📚", locationText: "回收桶", action: .discard, reason: "資訊過時"),
+            DeclutterItem(name: "不再穿的 T-shirt", imageName: "👕", locationText: "舊衣回收箱", action: .donate, reason: "斷捨離成功"),
+            DeclutterItem(name: "多餘的餐具", imageName: "🍴", locationText: "二手市集", action: .sellSecondHand, reason: "簡約生活"),
+            DeclutterItem(name: "壞掉的手錶", imageName: "⌚️", locationText: "垃圾桶", action: .discard, reason: "無法修理"),
+            DeclutterItem(name: "不常用的包包", imageName: "👜", locationText: "贈送給朋友", action: .donate, reason: "延續價值"),
+            DeclutterItem(name: "多餘的馬克杯", imageName: "🥛", locationText: "二手店", action: .sellSecondHand, reason: "清空桌面"),
+            DeclutterItem(name: "舊手機", imageName: "📱", locationText: "回收計畫", action: .discard, reason: "回收利用")
+        ]
+    }
     
     var notifications: [NotificationItem] {
         let milkExpiryText = shortDateString(daysFromToday: 2)
