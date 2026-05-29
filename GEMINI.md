@@ -24,7 +24,7 @@ There is currently no backend, database, network layer, real persistence, push n
   - `Theme/AppTheme.swift`: Shared colors, fonts, spacing, and view styles.
   - `Utilities/`: Shared helpers for app date formatting and user input trimming.
   - `Assets.xcassets/`: App icons, accent colors, and image assets.
-- `blueprint/`: Design reference images for the app.
+- `blueprint/`: Design reference boards and `README.md` image index.
 - `SOURCE_CODE_GUIDE.md`: Architecture, data flow, screen, and technical debt notes.
 - `BLUEPRINT_IMPLEMENTATION_REPORT.md`: Blueprint comparison, completion estimates, gaps, and suggested priorities.
 - `README.md`: User-facing project summary and setup instructions.
@@ -100,6 +100,16 @@ No XCTest target is currently committed.
 ## UI Direction
 
 Follow the blueprint direction documented in `BLUEPRINT_IMPLEMENTATION_REPORT.md`: compact inventory cards, restrained black/white/gray styling, bottom tab navigation, sticker-like item cards, space illustrations, and paper-like checklist screens.
+
+Blueprint image filenames are semantic and ordered:
+
+- `blueprint/01-dashboard-reminders.png`
+- `blueprint/02-spaces-items.png`
+- `blueprint/03-add-item-recognition.png`
+- `blueprint/04-lists-shopping-mode.png`
+- `blueprint/05-declutter-profile.png`
+
+When adding or replacing reference boards, update `blueprint/README.md` and `BLUEPRINT_IMPLEMENTATION_REPORT.md` together.
 
 When improving blueprint-facing screens, prioritize:
 

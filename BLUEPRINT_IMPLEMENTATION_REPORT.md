@@ -1,6 +1,16 @@
 # Blueprint 實作完成度與偏差報告
 
-本報告根據 `blueprint/1.png` 到 `blueprint/5.png` 對照目前 SwiftUI 實作，整理 APP 當前完成度、實作偏差與建議修正順序。
+本報告根據 `blueprint/` 內的 5 張 reference boards 對照目前 SwiftUI 實作，整理 app 當前完成度、實作偏差與建議修正順序。圖片檔名與索引請以 `blueprint/README.md` 為準。
+
+## Blueprint 對照索引
+
+| File | Scope |
+| --- | --- |
+| `blueprint/01-dashboard-reminders.png` | 首頁 Dashboard / 提醒系統 |
+| `blueprint/02-spaces-items.png` | 空間 / 物品展示 |
+| `blueprint/03-add-item-recognition.png` | 新增物品 / 自然語言輸入 / 相機辨識 / 確認表單 |
+| `blueprint/04-lists-shopping-mode.png` | 清單模式 / 購物模式 |
+| `blueprint/05-declutter-profile.png` | 斷捨離 / 設定 / Profile 成就 |
 
 ## 整體結論
 
@@ -14,6 +24,8 @@
 - Dashboard 首頁的核心資訊順序與設計稿不同。
 
 ## 01 首頁 / 提醒系統
+
+Reference: `blueprint/01-dashboard-reminders.png`
 
 設計稿重點：
 
@@ -40,6 +52,8 @@
 完成度：**約 75%**。資訊與核心卡片結構更完整，但商品素材與提醒卡視覺仍需補強。
 
 ## 02 空間 / 物品展示
+
+Reference: `blueprint/02-spaces-items.png`
 
 設計稿重點：
 
@@ -69,6 +83,8 @@
 完成度：**約 70%**。資訊架構與新增流程已可操作，但視覺資產仍不足。
 
 ## 03 新增物品 / 自動辨識
+
+Reference: `blueprint/03-add-item-recognition.png`
 
 設計稿重點：
 
@@ -104,6 +120,8 @@
 
 ## 04 清單 / 購物模式
 
+Reference: `blueprint/04-lists-shopping-mode.png`
+
 設計稿重點：
 
 - 清單模式是微調過的紙張感 checklist。
@@ -130,6 +148,8 @@
 完成度：**約 80%**。功能與模式切換最接近設計稿，但視覺細節和建議卡素材仍需補強。
 
 ## 05 斷捨離 / 設定成就
+
+Reference: `blueprint/05-declutter-profile.png`
 
 設計稿重點：
 

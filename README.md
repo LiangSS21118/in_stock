@@ -1,6 +1,6 @@
 # In Stock
 
-`in_stock` 是一個 SwiftUI iOS app prototype，用於管理家中庫存、到期提醒、購物清單、空間分類與斷捨離項目。專案目前以 mock data 驅動畫面，重點放在 APP 資訊架構、主要流程與設計稿實作驗證。
+`in_stock` 是一個 SwiftUI iOS app prototype，用於管理家中庫存、到期提醒、購物清單、空間分類與斷捨離項目。專案目前以 mock data 驅動畫面，重點放在 app 資訊架構、主要流程與 blueprint 對照驗證。
 
 ## 功能概覽
 
@@ -27,10 +27,11 @@ in_stock/
 │   ├── Views/             # Feature views
 │   ├── ContentView.swift  # Preview-friendly root wrapper
 │   └── in_stockApp.swift  # App entry point
-├── blueprint/             # APP design mockups
+├── blueprint/             # Blueprint reference boards and index
 ├── in_stock.xcodeproj/    # Xcode project
 ├── BLUEPRINT_IMPLEMENTATION_REPORT.md
 ├── SOURCE_CODE_GUIDE.md
+├── GEMINI.md
 └── README.md
 ```
 
@@ -62,18 +63,22 @@ xcodebuild -project in_stock.xcodeproj -scheme in_stock -destination 'platform=i
 
 更多細節請參考：
 
-- [SOURCE_CODE_GUIDE.md](SOURCE_CODE_GUIDE.md)：source code 導讀。
-- [BLUEPRINT_IMPLEMENTATION_REPORT.md](BLUEPRINT_IMPLEMENTATION_REPORT.md)：設計稿對照、完成度與偏差報告。
+- [SOURCE_CODE_GUIDE.md](SOURCE_CODE_GUIDE.md)：source code、資料流、主要畫面與技術債導讀。
+- [BLUEPRINT_IMPLEMENTATION_REPORT.md](BLUEPRINT_IMPLEMENTATION_REPORT.md)：blueprint 對照、完成度與偏差報告。
+- [blueprint/README.md](blueprint/README.md)：設計稿圖片索引、命名規則與對應 app 區域。
+- [GEMINI.md](GEMINI.md)：AI assistant 使用的英文專案摘要，內容需和 README / source guide 保持一致。
 
 ## 設計稿
 
-`blueprint/` 目錄包含 5 張 APP 設計稿：
+`blueprint/` 目錄包含 5 張 app blueprint reference boards，檔名保留原始順序並加入畫面語意：
 
-- `1.png`：首頁 / 提醒系統。
-- `2.png`：空間 / 物品展示。
-- `3.png`：新增物品 / 自動辨識。
-- `4.png`：清單 / 購物模式。
-- `5.png`：斷捨離 / 設定成就。
+- `01-dashboard-reminders.png`：首頁 Dashboard / 提醒系統。
+- `02-spaces-items.png`：空間 / 物品展示。
+- `03-add-item-recognition.png`：新增物品 / 自然語言輸入 / 相機辨識 / 確認表單。
+- `04-lists-shopping-mode.png`：清單模式 / 購物模式。
+- `05-declutter-profile.png`：斷捨離 / 設定 / Profile 成就。
+
+新增或替換設計稿時，請同步更新 [blueprint/README.md](blueprint/README.md) 與 [BLUEPRINT_IMPLEMENTATION_REPORT.md](BLUEPRINT_IMPLEMENTATION_REPORT.md)。
 
 ## 開發注意事項
 

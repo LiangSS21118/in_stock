@@ -1,6 +1,6 @@
 # Source Code 導讀
 
-這份文件整理 `in_stock` 專案的主要架構、資料流、畫面組成與目前值得注意的技術債。專案目前是一個純 SwiftUI、mock data driven 的 iOS app，主題是家庭庫存、購物清單、到期提醒與斷捨離管理。
+這份文件整理 `in_stock` 專案的主要架構、資料流、畫面組成與目前值得注意的技術債。專案目前是一個純 SwiftUI、mock data driven 的 iOS app prototype，主題是家庭庫存、購物清單、到期提醒與斷捨離管理。
 
 ## 整體架構
 
@@ -14,7 +14,14 @@
 - `in_stock/Data/MockData.swift`：所有假資料。
 - `in_stock/Theme/AppTheme.swift`：共用顏色、字體、卡片樣式。
 - `in_stock/Utilities/`：跨功能的小型 helper，例如日期格式與使用者輸入整理。
-- `blueprint/`：設計參考圖。
+- `blueprint/`：設計參考圖與圖片索引，詳見 `blueprint/README.md`。
+
+主要專案文件：
+
+- `README.md`：專案定位、功能概覽、建置方式與目前狀態。
+- `SOURCE_CODE_GUIDE.md`：目前這份 source code、資料流與技術債導讀。
+- `BLUEPRINT_IMPLEMENTATION_REPORT.md`：blueprint 對照、完成度與偏差報告。
+- `GEMINI.md`：AI assistant 使用的英文專案摘要，內容需和 README / source guide 保持一致。
 
 目前沒有 test target，也沒有後端、資料庫、網路層或持久化庫存資料。登入狀態使用 `@AppStorage`，其他 app 狀態都存在記憶體中的 ViewModel。
 
