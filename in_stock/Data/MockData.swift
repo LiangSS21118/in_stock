@@ -84,7 +84,7 @@ struct MockData {
     var notifications: [NotificationItem] {
         let milkExpiryText = shortDateString(daysFromToday: 2)
 
-        [
+        return [
             NotificationItem(title: "牛奶即將到期", message: "牛奶將於 \(milkExpiryText) 到期，請盡快飲用。", timeText: "現在", type: .expiringSoon),
             NotificationItem(title: "庫存不足提醒", message: "洗衣精快用完了，剩餘約 20%。", timeText: "上午 9:00", type: .lowStock),
             NotificationItem(title: "斷捨離待辦", message: "你有 2 項斷捨離待辦項目需要處理。", timeText: "昨天", type: .declutter)
