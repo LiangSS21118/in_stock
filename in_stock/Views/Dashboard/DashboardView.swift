@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @ObservedObject var viewModel: AppViewModel
+    @State private var showNotifications = false
 
     var body: some View {
         NavigationStack {
@@ -17,12 +18,26 @@ struct DashboardView: View {
                                 .font(AppTheme.titleFont)
                         }
                         Spacer()
-                        Image(systemName: "bell")
-                            .font(.system(size: 20))
-                            .padding(12)
-                            .background(Color.white)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(AppTheme.borderColor, lineWidth: 1))
+                        Button {
+                            showNotifications = true
+                        } label: {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "bell")
+                                    .font(.system(size: 20))
+                                    .padding(12)
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(AppTheme.borderColor, lineWidth: 1))
+                                
+                                if !viewModel.notifications.isEmpty {
+                                    Circle()
+                                        .fill(Color.red)
+                                        .frame(width: 8, height: 8)
+                                        .padding(4)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
                     }
                     .padding(.horizontal)
 
@@ -87,20 +102,28 @@ struct DashboardView: View {
                         }
                     }
 
-                    // Reminder Center
-                    VStack(alignment: .leading, spacing: 16) {
-                        SectionHeader(title: "提醒中心")
-                            .padding(.horizontal)
-
-                        ReminderCenterView(notifications: viewModel.notifications)
-                            .padding(.horizontal)
-                    }
-
                     Spacer(minLength: 100)
                 }
                 .padding(.top, 20)
             }
             .background(AppTheme.backgroundColor)
+            .sheet(isPresented: $showNotifications) {
+                NavigationStack {
+                    ReminderCenterView(notifications: viewModel.notifications)
+                        .padding()
+                        .navigationTitle("提醒中心")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("關閉") {
+                                    showNotifications = false
+                                }
+                            }
+                        }
+                        .background(AppTheme.backgroundColor)
+                }
+                .presentationDetents([.medium, .large])
+            }
         }
     }
 }
