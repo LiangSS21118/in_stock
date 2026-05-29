@@ -151,8 +151,8 @@ Dashboard 用的 computed properties 也在這裡：
 - `setShoppingItemQuantity`
 - `addShoppingItem`
 - `addLowStockItemToShoppingList`
-- `restockEntriesForCompletedShoppingItems`
-- `restockFromCompletedShoppingItems`
+- `restockEntriesForCompletedShoppingItems`：根據已勾選的購物品項產生回補預覽。若購物品項有 `sourceItemId` 或名稱吻合的庫存，會自動匹配。
+- `restockFromCompletedShoppingItems`：執行回補。已匹配項目會增加庫存數量並將剩餘比例設為 100%；未匹配項目會建立新的 `Item` 並加入指定空間。
 - `toggleDeclutterTodo`
 - `addDeclutterItem`
 - `updateDeclutterSettings`
