@@ -3,25 +3,37 @@ import SwiftUI
 struct ListView: View {
     @ObservedObject var viewModel: AppViewModel
     @State private var isShowingRestockConfirmation = false
+    @State private var isSearchActive = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Header
                 VStack(spacing: 16) {
-                    HStack {
-                        Text(viewModel.isShoppingFocusActive ? "購物模式" : "清單")
-                            .font(AppTheme.titleFont)
-                        Spacer()
-                        if viewModel.isShoppingFocusActive {
-                            Image(systemName: "cart.fill")
-                                .font(.system(size: 20))
-                        } else {
-                            Image(systemName: "magnifyingglass")
-                                .font(.system(size: 20))
+                    if isSearchActive {
+                        searchBar
+                    } else {
+                        HStack {
+                            Text(viewModel.isShoppingFocusActive ? "購物模式" : "清單")
+                                .font(AppTheme.titleFont)
+                            Spacer()
+                            if viewModel.isShoppingFocusActive {
+                                Image(systemName: "cart.fill")
+                                    .font(.system(size: 20))
+                            } else {
+                                Button {
+                                    withAnimation(.spring()) {
+                                        isSearchActive = true
+                                    }
+                                } label: {
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(.black)
+                                }
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
 
                     // Segmented Control
                     if viewModel.isShoppingFocusActive {
@@ -86,10 +98,14 @@ struct ListView: View {
 
                 // Content
                 ScrollView {
-                    if viewModel.selectedListMode == .checklist {
-                        ChecklistModeView(viewModel: viewModel)
+                    if isSearchActive && !viewModel.searchText.trimmedForUserInput.isEmpty {
+                        SearchToAddResultsView(viewModel: viewModel)
                     } else {
-                        ShoppingModeView(viewModel: viewModel)
+                        if viewModel.selectedListMode == .checklist {
+                            ChecklistModeView(viewModel: viewModel)
+                        } else {
+                            ShoppingModeView(viewModel: viewModel)
+                        }
                     }
                     Spacer(minLength: 100)
                 }
@@ -111,7 +127,133 @@ struct ListView: View {
             .fullScreenCover(isPresented: $isShowingRestockConfirmation) {
                 RestockConfirmationView(viewModel: viewModel)
             }
+            .toolbar(.hidden, for: .navigationBar)
         }
+    }
+
+    private var searchBar: some View {
+        HStack(spacing: 12) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                TextField("搜尋物品加入清單...", text: $viewModel.searchText)
+                    .font(AppTheme.bodyFont)
+                if !viewModel.searchText.isEmpty {
+                    Button {
+                        viewModel.searchText = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+            .padding(10)
+            .background(Color(white: 0.95))
+            .cornerRadius(10)
+            
+            Button("取消") {
+                withAnimation(.spring()) {
+                    isSearchActive = false
+                    viewModel.searchText = ""
+                }
+            }
+            .font(AppTheme.bodyFont.bold())
+            .foregroundColor(.black)
+        }
+        .padding(.horizontal)
+    }
+}
+
+struct SearchToAddResultsView: View {
+    @ObservedObject var viewModel: AppViewModel
+    @State private var addedItemIds: Set<UUID> = []
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(title: "可加入品項")
+                .padding(.horizontal)
+
+            if viewModel.filteredItems.isEmpty {
+                VStack(spacing: 12) {
+                    Text("找不到相關物品")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                    
+                    Button {
+                        viewModel.addShoppingItem(name: viewModel.searchText)
+                        viewModel.searchText = ""
+                    } label: {
+                        Text("直接新增「\(viewModel.searchText)」")
+                            .font(AppTheme.bodyFont.bold())
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(Color.black)
+                            .cornerRadius(10)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 40)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(viewModel.filteredItems) { item in
+                        SearchToAddRow(
+                            item: item,
+                            isAdded: viewModel.isInShoppingList(item) || addedItemIds.contains(item.id)
+                        ) {
+                            viewModel.addLowStockItemToShoppingList(item)
+                            addedItemIds.insert(item.id)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+}
+
+struct SearchToAddRow: View {
+    let item: Item
+    let isAdded: Bool
+    let action: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(item.imageName)
+                .font(.system(size: 24))
+                .frame(width: 40, height: 40)
+                .background(Color(white: 0.95))
+                .clipShape(Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.name)
+                    .font(AppTheme.bodyFont.bold())
+                    .foregroundColor(AppTheme.primaryText)
+                Text("\(item.locationText) · 剩餘 \(Int(item.remainingPercentage * 100))%")
+                    .font(AppTheme.captionFont)
+                    .foregroundColor(AppTheme.secondaryText)
+            }
+
+            Spacer()
+
+            Button(action: action) {
+                HStack(spacing: 4) {
+                    Image(systemName: isAdded ? "checkmark" : "plus")
+                    Text(isAdded ? "已加入" : "加入")
+                }
+                .font(AppTheme.captionFont.bold())
+                .foregroundColor(isAdded ? .gray : .white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(isAdded ? Color(white: 0.9) : Color.black)
+                .cornerRadius(10)
+            }
+            .disabled(isAdded)
+        }
+        .padding(12)
+        .background(Color.white)
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1))
     }
 }
 

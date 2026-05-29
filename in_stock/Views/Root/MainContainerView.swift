@@ -24,7 +24,7 @@ struct MainContainerView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 60) // Space for TabBar
+            .padding(.bottom, 90) // Increased space for TabBar and sticky buttons
             
             // Fixed Bottom Tab Bar
             CustomTabBar(

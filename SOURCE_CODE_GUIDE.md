@@ -49,6 +49,8 @@
 - `.lists`：清單。
 - `.settings`：個人頁。
 
+內容區域下方墊有約 90pt 的 padding 以確保內容不被底部 tab bar 遮擋，特別是清單頁的「購物完畢」固定按鈕。
+
 底部 tab bar 是 `Components/CustomTabBar.swift`，中間有浮動 `+` 按鈕，點擊後切到 `.add`。
 
 ## 資料模型
@@ -125,6 +127,7 @@
 - `declutterItems`
 - `achievements`
 - `pendingAddSpaceId`
+- `searchText`：搜尋文字，用於過濾庫存物品與購物清單。
 
 Dashboard 用的 computed properties 也在這裡：
 
@@ -205,7 +208,7 @@ Dashboard 顯示：
 - `Views/Spaces/SpaceView.swift`
 - `Views/Spaces/SpaceDetailView.swift`
 
-`SpaceView` 顯示空間 grid。每個空間點進去後，`SpaceDetailView` 透過：
+`SpaceView` 顯示空間 grid。支援搜尋功能，啟動搜尋後會隱藏空間 grid 並顯示符合關鍵字的庫存物品 grid。每個空間點進去後，`SpaceDetailView` 透過：
 
 ```swift
 viewModel.itemsForSpace(space.id)
@@ -247,8 +250,8 @@ viewModel.itemsForSpace(space.id)
 
 `ListView` 內建 segmented control，切換：
 
-- 清單模式：支援紙張風購物清單與斷捨離待辦卡。新增動態日期顯示與 empty state。建議購入與建議斷捨離項改為可點選加入。
-- 購物模式：支援數量 stepper（已勾選項目會停用調整）、新增品項列、低庫存快速加入。
+- 清單模式：支援紙張風購物清單與斷捨離待辦卡。支援搜尋功能以從庫存中尋找品項並加入清單。新增動態日期顯示與 empty state。建議購入與建議斷捨離項改為可點選加入。
+- 購物模式：支援數量 stepper（已勾選項目會停用調整）、新增品項列、低庫存快速加入。同樣支援搜尋物品加入功能。
 - 柔性專注：購物中啟動「專注模式」，隱藏 segmented control 與搜尋入口，頂部顯示專注狀態，保留底部 tab 以維持導覽彈性。從 Dashboard 進入會自動啟動，手動切換則提供開啟按鈕。
 - 購物完畢：在購物模式底部顯示，當有項目勾選時啟用。進入 `RestockConfirmationView` 回補確認頁，已匹配項目可回補原庫存，未匹配項目可自選空間 / 位置新增到庫存，或選擇略過。
 

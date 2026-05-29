@@ -17,6 +17,7 @@ class AppViewModel: ObservableObject {
     @Published var doneDeclutterItems: [DeclutterItem] = MockData.shared.doneDeclutterItems
     @Published var achievements: [Achievement] = MockData.shared.achievements
     @Published var pendingAddSpaceId: UUID?
+    @Published var searchText: String = ""
 
     // Computed Properties for Dashboard
     var lowStockItems: [Item] {
@@ -25,6 +26,21 @@ class AppViewModel: ObservableObject {
     
     var expiringSoonItems: [Item] {
         items.filter { $0.status == .expiringSoon }
+    }
+
+    // Filtered Items for Search
+    var filteredItems: [Item] {
+        if searchText.trimmedForUserInput.isEmpty {
+            return items
+        }
+        return items.filter { $0.name.localizedCaseInsensitiveContains(searchText.trimmedForUserInput) }
+    }
+
+    var filteredShoppingItems: [ShoppingListItem] {
+        if searchText.trimmedForUserInput.isEmpty {
+            return shoppingItems
+        }
+        return shoppingItems.filter { $0.name.localizedCaseInsensitiveContains(searchText.trimmedForUserInput) }
     }
     
     var shoppingListCount: Int {
