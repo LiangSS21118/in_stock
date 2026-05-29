@@ -16,7 +16,7 @@ struct StickerItemCard: View {
                 .lineLimit(1)
             
             if item.status == .expiringSoon, let date = item.expiryDate {
-                Text(dateFormatter.string(from: date))
+                Text(AppDateFormatter.fullDateString(from: date))
                     .font(AppTheme.captionFont)
                     .foregroundColor(AppTheme.expiringSoonText)
             } else {
@@ -32,11 +32,5 @@ struct StickerItemCard: View {
         }
         .frame(width: 120, alignment: .leading)
         .stickerStyle()
-    }
-    
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        return formatter
     }
 }

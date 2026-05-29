@@ -101,8 +101,6 @@ struct MockData {
 
     private func shortDateString(daysFromToday days: Int) -> String {
         let date = Calendar.current.date(byAdding: .day, value: days, to: Date()) ?? Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "M/d"
-        return formatter.string(from: date)
+        return AppDateFormatter.shortMonthDayString(from: date)
     }
 }

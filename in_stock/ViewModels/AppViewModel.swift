@@ -14,10 +14,7 @@ class AppViewModel: ObservableObject {
     @Published var declutterItems: [DeclutterItem] = MockData.shared.declutterItems
     @Published var achievements: [Achievement] = MockData.shared.achievements
     @Published var pendingAddSpaceId: UUID?
-    
-    init() {
-    }
-    
+
     // Computed Properties for Dashboard
     var lowStockItems: [Item] {
         items.filter { $0.status == .lowStock }
@@ -96,13 +93,13 @@ class AppViewModel: ObservableObject {
 
     // Space operations
     func addSpace(name: String) {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedName = name.trimmedForUserInput
         guard !trimmedName.isEmpty else { return }
 
         let newSpace = Space(
             name: trimmedName,
             illustrationName: "square.grid.2x2",
-            asciiArtText: asciiArt(for: trimmedName)
+            asciiArtText: Space.placeholderAsciiArt(for: trimmedName)
         )
         spaces.append(newSpace)
     }
@@ -115,17 +112,17 @@ class AppViewModel: ObservableObject {
     }
 
     func updateShoppingItemQuantity(for id: UUID, increment: Bool) {
-        guard let index = shoppingItems.firstIndex(where: { $0.id == id }) else { return }
+        guard let item = shoppingItems.first(where: { $0.id == id }) else { return }
+        setShoppingItemQuantity(for: id, quantity: item.quantity + (increment ? 1 : -1))
+    }
 
-        if increment {
-            shoppingItems[index].quantity += 1
-        } else if shoppingItems[index].quantity > 1 {
-            shoppingItems[index].quantity -= 1
-        }
+    func setShoppingItemQuantity(for id: UUID, quantity: Int) {
+        guard let index = shoppingItems.firstIndex(where: { $0.id == id }) else { return }
+        shoppingItems[index].quantity = max(1, quantity)
     }
 
     func addShoppingItem(name: String) {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedName = name.trimmedForUserInput
         guard !trimmedName.isEmpty else { return }
 
         if let index = shoppingItems.firstIndex(where: { $0.name == trimmedName }) {
@@ -143,11 +140,11 @@ class AppViewModel: ObservableObject {
 
     // Declutter operations
     func addDeclutterItem(name: String, locationText: String, action: DeclutterAction, reason: String = "") {
-        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedName = name.trimmedForUserInput
         guard !trimmedName.isEmpty else { return }
 
-        let trimmedLocation = locationText.trimmingCharacters(in: .whitespacesAndNewlines)
-        let trimmedReason = reason.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedLocation = locationText.trimmedForUserInput
+        let trimmedReason = reason.trimmedForUserInput
         let newItem = DeclutterItem(
             name: trimmedName,
             imageName: "📦",
@@ -168,10 +165,10 @@ class AppViewModel: ObservableObject {
     ) {
         guard let index = declutterItems.firstIndex(where: { $0.id == id }) else { return }
 
-        declutterItems[index].reason = reason.trimmingCharacters(in: .whitespacesAndNewlines)
+        declutterItems[index].reason = reason.trimmedForUserInput
         declutterItems[index].lastUsedDate = lastUsedDate
         declutterItems[index].reminderCycle = reminderCycle
-        declutterItems[index].futureMessage = futureMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+        declutterItems[index].futureMessage = futureMessage.trimmedForUserInput
     }
 
     private func progressText(for rows: [ShoppingListItem]) -> String {
@@ -179,30 +176,4 @@ class AppViewModel: ObservableObject {
         return "\(checked) / \(rows.count)"
     }
 
-    private func asciiArt(for name: String) -> String {
-        if name.contains("廚") {
-            return """
-             [  ]  [  ]
-             |__|__|__|
-             |        |
-             |________|
-            """
-        }
-
-        if name.contains("衣") || name.contains("臥") {
-            return """
-              ________
-             |  ____  |
-             | |    | |
-             |_|____|_|
-            """
-        }
-
-        return """
-          _______
-         |       |
-         |  [ ]  |
-         |_______|
-        """
-    }
 }

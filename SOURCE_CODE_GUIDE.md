@@ -13,6 +13,7 @@
 - `in_stock/Components/`：共用 SwiftUI 元件。
 - `in_stock/Data/MockData.swift`：所有假資料。
 - `in_stock/Theme/AppTheme.swift`：共用顏色、字體、卡片樣式。
+- `in_stock/Utilities/`：跨功能的小型 helper，例如日期格式與使用者輸入整理。
 - `blueprint/`：設計參考圖。
 
 目前沒有 test target，也沒有後端、資料庫、網路層或持久化庫存資料。登入狀態使用 `@AppStorage`，其他 app 狀態都存在記憶體中的 ViewModel。
@@ -67,14 +68,14 @@
 
 其他模型都很薄：
 
-- `Space`：空間分類，包含 ASCII art 與 `items` 欄位。
+- `Space`：空間分類，包含 icon name 與 ASCII placeholder art。
 - `ShoppingListItem`：購物清單項目。
 - `DeclutterItem`：斷捨離項目。
 - `NotificationItem`：提醒中心通知。
 - `Achievement`：個人成就。
 - `User`：使用者資料。
 
-要注意：`Space` 裡雖然有 `items: [Item]`，但目前實際邏輯沒有用它儲存物品。真正的庫存清單在 `AppViewModel.items`，再用 `spaceId` 過濾。
+空間與物品的關聯只有一個來源：真正的庫存清單在 `AppViewModel.items`，並透過 `Item.spaceId` 過濾到對應空間。`Space` 不再保存自己的 item array，避免和 app-wide inventory state 產生雙重來源。
 
 ## MockData
 
@@ -136,12 +137,13 @@ Dashboard 用的 computed properties 也在這裡：
 - `addSpace(name:)`
 - `toggleShoppingItem`
 - `updateShoppingItemQuantity`
+- `setShoppingItemQuantity`
 - `addShoppingItem`
 - `toggleDeclutterTodo`
 - `addDeclutterItem`
 - `updateDeclutterSettings`
 
-購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的購物清單數字與清單頁會讀同一份 live state。`MockData.shared` 仍只負責提供初始資料。
+購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的購物清單數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、新增品項都經由 `AppViewModel` 方法更新，不讓 View 直接持有第二份清單邏輯。`MockData.shared` 仍只負責提供初始資料。
 
 `AddItemViewModel` 管新增物品流程：
 
@@ -233,7 +235,7 @@ viewModel.itemsForSpace(space.id)
 - 清單模式：購物清單卡、斷捨離待辦卡、建議購入、建議斷捨離。
 - 購物模式：購物清單 row，可勾選與調整數量。
 
-清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並支援在清單底部新增購物品項。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
+清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並透過 `AppViewModel.setShoppingItemQuantity(for:quantity:)` 更新數量，避免 View 直接修改 `shoppingItems` 陣列元素。畫面也支援在清單底部新增購物品項。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
 
 ### 斷捨離頁
 
@@ -282,6 +284,11 @@ Theme 在 `Theme/AppTheme.swift`，定義：
 - `SectionHeader`：區塊標題。
 - `QuantityStepper`：數量加減器，用於購物模式與新增物品確認表單。
 
+跨功能 helper 在 `Utilities/`：
+
+- `AppDateFormatter`：集中 `yyyy/MM/dd` 與 `M/d` 兩種目前 UI 需要的日期格式，避免各 View 重複建立 formatter。
+- `String.trimmedForUserInput`：集中表單輸入 trim 規則，讓新增空間、購物品項、斷捨離項目與新增物品流程使用同一套空白處理。
+
 ## Xcode Project 狀態
 
 `in_stock.xcodeproj` 目前只有一個 native target：`in_stock`。
@@ -305,12 +312,16 @@ Theme 在 `Theme/AppTheme.swift`，定義：
 3. App state 尚未持久化。
    `AppViewModel` 已收斂主要 mock state，但資料重啟後仍會回到 `MockData` 初始值。
 
-4. `Space.items` 欄位目前實際沒用。
-   真正物品歸屬是 `Item.spaceId`。建議保留一種資料關聯方式即可。
-
-5. 尚未建立 test target。
+4. 尚未建立 test target。
    建議下一步補 XCTest target，優先測 `AppViewModel` 的新增、更新與清單操作。
+
+近期已清理的技術債：
+
+- 移除未使用的 `Space.items`，保留 `AppViewModel.items` + `Item.spaceId` 作為唯一庫存關聯。
+- 將重複的 `DateFormatter` 建立集中到 `AppDateFormatter`。
+- 將使用者輸入 trim 規則集中到 `String.trimmedForUserInput`。
+- 將購物模式的 row 勾選與數量調整收斂到 `AppViewModel` 方法。
 
 ## 總結
 
-整體來看，這是一個完成度偏 prototype / UI mock 的 SwiftUI app：畫面與資料模型已經鋪好，使用者可走登入、Dashboard、空間、清單、新增物品、斷捨離、個人頁等主要流程；下一階段的重點會是導入視覺資產、加入持久化、替換 mock 辨識流程，然後補測試。
+整體來看，這是一個完成度偏 prototype / UI mock 的 SwiftUI app：畫面與資料模型已經鋪好，使用者可走登入、Dashboard、空間、清單、新增物品、斷捨離、個人頁等主要流程。主要 app state 已集中在 `AppViewModel`，空間與庫存關聯也已收斂到單一資料來源；下一階段的重點會是導入視覺資產、加入持久化、替換 mock 辨識流程，然後補測試。

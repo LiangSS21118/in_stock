@@ -65,7 +65,7 @@ struct CameraRecognitionView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         ResultRow(label: "品項", value: viewModel.itemName)
                         ResultRow(label: "數量", value: "\(Int(viewModel.quantity)) \(viewModel.unit)")
-                        ResultRow(label: "到期日", value: dateFormatter.string(from: viewModel.expiryDate))
+                        ResultRow(label: "到期日", value: AppDateFormatter.fullDateString(from: viewModel.expiryDate))
                         ResultRow(label: "所在空間", value: "\(spaceName) / \(viewModel.locationText)")
                     }
                     .padding()
@@ -95,12 +95,6 @@ struct CameraRecognitionView: View {
 
     private var spaceName: String {
         appViewModel.spaces.first(where: { $0.id == viewModel.selectedSpaceId })?.name ?? "未分類"
-    }
-
-    private var dateFormatter: DateFormatter {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy/MM/dd"
-        return f
     }
 }
 

@@ -20,9 +20,9 @@ struct ShoppingModeView: View {
             
             // List Items
             VStack(spacing: 12) {
-                ForEach($viewModel.shoppingItems) { $item in
+                ForEach(viewModel.shoppingItems) { item in
                     HStack {
-                        Button { item.isChecked.toggle() } label: {
+                        Button { viewModel.toggleShoppingItem(item.id) } label: {
                             Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
                                 .font(.system(size: 24))
                                 .foregroundColor(item.isChecked ? .black : .gray)
@@ -34,7 +34,7 @@ struct ShoppingModeView: View {
                         
                         Spacer()
                         
-                        QuantityStepper(value: $item.quantity, maxValue: 24)
+                        QuantityStepper(value: quantityBinding(for: item), maxValue: 24)
                     }
                     .padding()
                     .background(Color.white)
@@ -57,7 +57,7 @@ struct ShoppingModeView: View {
                             .font(AppTheme.captionFont.bold())
                             .foregroundColor(.black)
                     }
-                    .disabled(newItemName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(newItemName.trimmedForUserInput.isEmpty)
                 }
                 .padding()
                 .foregroundColor(.gray)
@@ -105,5 +105,16 @@ struct ShoppingModeView: View {
     private func addShoppingItem() {
         viewModel.addShoppingItem(name: newItemName)
         newItemName = ""
+    }
+
+    private func quantityBinding(for item: ShoppingListItem) -> Binding<Int> {
+        Binding(
+            get: {
+                viewModel.shoppingItems.first(where: { $0.id == item.id })?.quantity ?? item.quantity
+            },
+            set: {
+                viewModel.setShoppingItemQuantity(for: item.id, quantity: $0)
+            }
+        )
     }
 }

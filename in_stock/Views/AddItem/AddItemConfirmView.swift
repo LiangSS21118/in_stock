@@ -92,7 +92,7 @@ struct AddItemConfirmView: View {
                 .padding(.horizontal)
 
                 PrimaryButton(title: "新增到庫存", action: {
-                    let trimmedLocation = viewModel.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let trimmedLocation = viewModel.locationText.trimmedForUserInput
                     let expiryDate = viewModel.isConsumable ? viewModel.expiryDate : nil
                     let status = appViewModel.status(
                         for: expiryDate,
@@ -115,7 +115,7 @@ struct AddItemConfirmView: View {
                     appViewModel.addItem(newItem)
                     viewModel.reset(defaultSpaceId: appViewModel.spaces.first?.id)
                     appViewModel.selectedTab = .home
-                }, isDisabled: viewModel.itemName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }, isDisabled: viewModel.itemName.trimmedForUserInput.isEmpty)
                 .padding(.horizontal)
                 .padding(.bottom, 40)
             }

@@ -26,7 +26,7 @@ struct DeclutterDetailView: View {
                     
                     HStack(spacing: 20) {
                         InfoBlock(label: "位置", value: item.locationText)
-                        InfoBlock(label: "新增日期", value: dateFormatter.string(from: item.createdAt))
+                        InfoBlock(label: "新增日期", value: AppDateFormatter.fullDateString(from: item.createdAt))
                     }
                     
                     Rectangle().frame(height: 1).foregroundColor(AppTheme.borderColor)
@@ -50,12 +50,6 @@ struct DeclutterDetailView: View {
         }
         .background(AppTheme.backgroundColor)
         .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    private var dateFormatter: DateFormatter {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy/MM/dd"
-        return f
     }
 }
 

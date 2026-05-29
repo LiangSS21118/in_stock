@@ -83,7 +83,7 @@ private struct NewSpaceSheet: View {
             PrimaryButton(
                 title: "新增",
                 action: onSave,
-                isDisabled: spaceName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                isDisabled: spaceName.trimmedForUserInput.isEmpty
             )
 
             Spacer()

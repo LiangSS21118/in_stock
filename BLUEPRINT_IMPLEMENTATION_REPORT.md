@@ -54,6 +54,7 @@
 - `SpaceView` 已有空間列表、房屋 ASCII header、新增空間卡。
 - `SpaceDetailView` 已有單一空間頁、該空間物品 grid、新增物品卡。
 - `itemsForSpace(space.id)` 已能正確按空間過濾。
+- 空間與物品關聯已收斂為 `AppViewModel.items` + `Item.spaceId`，`Space` 不再保存第二份物品陣列。
 - 新增空間分類會開啟 sheet 建立 mock 空間。
 - 從空間詳情新增物品時，新增流程會預選該空間。
 
@@ -117,6 +118,7 @@
 - `ChecklistModeView` 有購物清單、斷捨離待辦、建議購入、建議斷捨離。
 - `ShoppingModeView` 有購物清單、checkbox、`QuantityStepper`、新增品項列、建議購入。
 - 清單狀態已收斂到 `AppViewModel`，Dashboard 與清單頁讀同一份資料。
+- 購物模式的勾選與數量調整已透過 `AppViewModel` 方法更新，避免 View 直接維護清單操作邏輯。
 
 主要偏差：
 
@@ -179,6 +181,7 @@
 - 斷捨離主流程、設定儲存與新增項目。
 - 新增空間與新增購物清單品項。
 - 購物清單與 Dashboard 同步。
+- 空間和庫存關聯已收斂到單一資料來源，並集中日期格式與輸入 trim helper。
 
 未完成或明顯缺口：
 

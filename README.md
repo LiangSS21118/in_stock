@@ -22,6 +22,7 @@ in_stock/
 │   ├── Data/              # Mock data
 │   ├── Models/            # Domain models and enums
 │   ├── Theme/             # Shared colors, fonts, and view styles
+│   ├── Utilities/         # Shared date formatting and input helpers
 │   ├── ViewModels/        # Observable state and mock operations
 │   ├── Views/             # Feature views
 │   ├── ContentView.swift  # Preview-friendly root wrapper
@@ -81,7 +82,8 @@ xcodebuild -project in_stock.xcodeproj -scheme in_stock -destination 'platform=i
 - 初始資料集中在 `MockData.shared`。
 - 目前庫存、購物清單、斷捨離清單與斷捨離待辦狀態集中在 `AppViewModel`。
 - 庫存資料以 `AppViewModel.items` 為主，透過 `Item.spaceId` 關聯空間。
-- `Space.items` 欄位目前未被主要流程使用。
+- `Space` 僅保存空間顯示資訊；不另外保存物品陣列，避免和 `AppViewModel.items` 形成雙重資料來源。
+- 共用日期格式與使用者輸入 trim 規則集中在 `Utilities/`。
 - `DeclutterView` 可由 Dashboard 統計卡與清單頁進入。
 
 ## 建議後續工作

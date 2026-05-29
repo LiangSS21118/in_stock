@@ -15,13 +15,14 @@ There is currently no backend, database, network layer, real persistence, push n
 
 - `in_stock/`: Main application source code.
   - `in_stockApp.swift`: App entry point. Creates and injects `AuthViewModel` and `AppViewModel`.
-  - `ContentView.swift`: Xcode template view, currently not part of the main flow.
+  - `ContentView.swift`: Preview-friendly root wrapper.
   - `Views/`: Feature views grouped by area, including `Auth`, `Dashboard`, `Lists`, `Profile`, `Root`, and `Spaces`.
   - `Components/`: Reusable SwiftUI controls, cards, tab bar, badges, and item UI.
   - `Models/`: Domain models and enums such as `Item`, `Space`, `AppTab`, and `DeclutterItem`.
   - `ViewModels/`: Observable state and mock operation logic.
   - `Data/MockData.swift`: Sample users, spaces, inventory items, shopping list items, declutter items, notifications, and achievements.
   - `Theme/AppTheme.swift`: Shared colors, fonts, spacing, and view styles.
+  - `Utilities/`: Shared helpers for app date formatting and user input trimming.
   - `Assets.xcassets/`: App icons, accent colors, and image assets.
 - `blueprint/`: Design reference images for the app.
 - `SOURCE_CODE_GUIDE.md`: Architecture, data flow, screen, and technical debt notes.
@@ -51,11 +52,12 @@ There is currently no backend, database, network layer, real persistence, push n
 
 - `MockData.shared` is a data factory. Its collections are computed properties and should not be treated as persistent storage.
 - App-wide inventory state lives in `AppViewModel.items`.
-- `Space.items` exists on the model but is not the main source of truth for inventory filtering.
-- Dashboard shopping list counts currently read from mock data instead of shared list state.
-- `ListViewModel` owns list state locally inside `ListView`, so list changes are not app-wide yet.
+- Space-to-item ownership is represented only by `Item.spaceId`; `Space` stores display metadata and placeholder artwork, not a second item array.
+- Dashboard, checklist mode, and shopping mode all read shared list state from `AppViewModel`.
+- Shopping-mode row actions go through `AppViewModel` methods instead of mutating `shoppingItems` directly in the view.
 - Add item flows are mock implementations: natural language parsing and camera recognition use hardcoded behavior.
-- Several buttons are placeholders, including adding spaces, adding shopping items, adding declutter items, and saving declutter settings.
+- Adding spaces, shopping items, declutter items, and declutter settings all have mock state updates.
+- Date strings should use `AppDateFormatter`; form empty checks should use `String.trimmedForUserInput`.
 - The visual implementation still relies heavily on emoji, SF Symbols, and ASCII placeholders where blueprint images show product stickers or room line art.
 
 ## Building and Running
@@ -101,11 +103,8 @@ Follow the blueprint direction documented in `BLUEPRINT_IMPLEMENTATION_REPORT.md
 
 When improving blueprint-facing screens, prioritize:
 
-1. Connecting `DeclutterView` into the main flow.
-2. Moving shopping list state into shared app state.
-3. Filling placeholder add/save actions.
-4. Tightening the add-item confirmation form into a compact row-based layout.
-5. Replacing emoji and ASCII placeholders with real assets in `Assets.xcassets`.
-6. Fixing stale mock dates.
-7. Aligning Profile achievements with the blueprint.
-8. Resetting `AddItemViewModel` after successful add and supporting preselected space entry.
+1. Replacing emoji and ASCII placeholders with real assets in `Assets.xcassets`.
+2. Adding persistence so mock state survives app restart.
+3. Replacing mock natural-language parsing, camera recognition, and reminders with real services.
+4. Adding an XCTest target for `AppViewModel` and model behavior.
+5. Continuing visual polish on checklist paper styling, sticker item cards, reminder cards, and declutter rows.

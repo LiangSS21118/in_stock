@@ -62,7 +62,7 @@ struct DeclutterRow: View {
                 HStack(spacing: 8) {
                     Text(item.locationText)
                     Text("•")
-                    Text(dateFormatter.string(from: item.createdAt))
+                    Text(AppDateFormatter.fullDateString(from: item.createdAt))
                 }
                 .font(.system(size: 10))
                 .foregroundColor(.gray)
@@ -85,13 +85,7 @@ struct DeclutterRow: View {
         .cornerRadius(AppTheme.cornerRadius)
         .overlay(RoundedRectangle(cornerRadius: AppTheme.cornerRadius).stroke(AppTheme.borderColor, lineWidth: 1))
     }
-    
-    private var dateFormatter: DateFormatter {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy/MM/dd"
-        return f
-    }
-    
+
     private func badgeColor(_ action: DeclutterAction) -> Color {
         switch action {
         case .donate: return .green
@@ -137,7 +131,7 @@ private struct NewDeclutterItemSheet: View {
             PrimaryButton(
                 title: "新增",
                 action: save,
-                isDisabled: name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                isDisabled: name.trimmedForUserInput.isEmpty
             )
 
             Spacer()

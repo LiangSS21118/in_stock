@@ -52,7 +52,7 @@ struct NaturalLanguageInputView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         ResultRow(label: "品項", value: viewModel.itemName)
                         ResultRow(label: "數量", value: "\(Int(viewModel.quantity)) \(viewModel.unit)")
-                        ResultRow(label: "到期日", value: dateFormatter.string(from: viewModel.expiryDate))
+                        ResultRow(label: "到期日", value: AppDateFormatter.fullDateString(from: viewModel.expiryDate))
                     }
                     .padding()
                     .background(Color.white)
@@ -78,12 +78,6 @@ struct NaturalLanguageInputView: View {
         .padding(.top, 20)
         .background(AppTheme.backgroundColor)
         .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    private var dateFormatter: DateFormatter {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy/MM/dd"
-        return f
     }
 }
 
