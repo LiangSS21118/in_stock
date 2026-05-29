@@ -13,7 +13,7 @@ struct ReminderCenterView: View {
             VStack(alignment: .leading, spacing: 12) {
                 ReminderInfoRow(title: "低庫存提醒", description: "物品低於門檻時自動通知")
                 ReminderInfoRow(title: "即將到期提醒", description: "物品到期前 2-7 天主動通知")
-                ReminderInfoRow(title: "購物模式切換", description: "採買時一鍵開啟購物清單清單")
+                ReminderInfoRow(title: "購物模式切換", description: "採買時一鍵開啟購物清單")
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)

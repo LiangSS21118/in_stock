@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct DeclutterDetailView: View {
+    @ObservedObject var viewModel: AppViewModel
     let item: DeclutterItem
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ScrollView {
@@ -31,7 +31,7 @@ struct DeclutterDetailView: View {
                     
                     Rectangle().frame(height: 1).foregroundColor(AppTheme.borderColor)
                     
-                    NavigationLink(destination: DeclutterSettingsView()) {
+                    NavigationLink(destination: DeclutterSettingsView(viewModel: viewModel, item: item)) {
                         HStack {
                             Text("斷捨離設定")
                                 .font(AppTheme.headerFont)

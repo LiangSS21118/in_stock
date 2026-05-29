@@ -8,20 +8,23 @@ struct AchievementView: View {
             Text("我的成就")
                 .font(AppTheme.headerFont)
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3), spacing: 10) {
                 ForEach(achievements) { ach in
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(spacing: 10) {
                         Image(systemName: ach.iconName)
                             .font(.system(size: 24))
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(spacing: 4) {
                             Text(ach.title)
                                 .font(AppTheme.captionFont)
                                 .foregroundColor(.gray)
+                                .multilineTextAlignment(.center)
                             Text("\(formattedValue(ach.value)) \(ach.unit)")
                                 .font(AppTheme.headerFont)
+                                .minimumScaleFactor(0.75)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 118)
                     .padding()
                     .background(Color.white)
                     .cornerRadius(12)

@@ -5,7 +5,6 @@ struct RegisterView: View {
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         VStack(spacing: 24) {

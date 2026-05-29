@@ -70,6 +70,12 @@ struct AddItemEntryView: View {
                 Spacer()
             }
             .background(AppTheme.backgroundColor)
+            .onAppear {
+                addItemViewModel.syncSpaces(appViewModel.spaces)
+                if let pendingSpaceId = appViewModel.consumePendingAddSpaceId() {
+                    addItemViewModel.preselectSpace(pendingSpaceId)
+                }
+            }
         }
     }
 }

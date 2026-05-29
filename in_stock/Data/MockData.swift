@@ -64,6 +64,13 @@ struct MockData {
             ShoppingListItem(name: "牙膏", quantity: 1)
         ]
     }
+
+    var declutterTodos: [ShoppingListItem] {
+        [
+            ShoppingListItem(name: "玄關備用傘", isChecked: false),
+            ShoppingListItem(name: "重複購買的馬克杯", isChecked: true)
+        ]
+    }
     
     var declutterItems: [DeclutterItem] {
         [
@@ -75,8 +82,10 @@ struct MockData {
     }
     
     var notifications: [NotificationItem] {
+        let milkExpiryText = shortDateString(daysFromToday: 2)
+
         [
-            NotificationItem(title: "牛奶即將到期", message: "牛奶將於 5/2 到期，請盡快飲用。", timeText: "現在", type: .expiringSoon),
+            NotificationItem(title: "牛奶即將到期", message: "牛奶將於 \(milkExpiryText) 到期，請盡快飲用。", timeText: "現在", type: .expiringSoon),
             NotificationItem(title: "庫存不足提醒", message: "洗衣精快用完了，剩餘約 20%。", timeText: "上午 9:00", type: .lowStock),
             NotificationItem(title: "斷捨離待辦", message: "你有 2 項斷捨離待辦項目需要處理。", timeText: "昨天", type: .declutter)
         ]
@@ -88,5 +97,12 @@ struct MockData {
             Achievement(title: "騰出空間", value: 2.4, unit: "m³", iconName: "square.dashed"),
             Achievement(title: "持續天數", value: 45, unit: "天", iconName: "calendar")
         ]
+    }
+
+    private func shortDateString(daysFromToday days: Int) -> String {
+        let date = Calendar.current.date(byAdding: .day, value: days, to: Date()) ?? Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return formatter.string(from: date)
     }
 }

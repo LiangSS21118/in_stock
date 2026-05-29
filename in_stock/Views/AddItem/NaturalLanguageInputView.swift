@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 import Foundation
 
 struct NaturalLanguageInputView: View {
@@ -35,8 +34,7 @@ struct NaturalLanguageInputView: View {
             .padding(.horizontal)
             
             PrimaryButton(title: viewModel.isParsing ? "解析中..." : "解析輸入內容", action: {
-                viewModel.parseNaturalLanguage()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                viewModel.parseNaturalLanguage {
                     showConfirm = true
                 }
             }, isDisabled: viewModel.inputText.isEmpty || viewModel.isParsing)

@@ -16,7 +16,7 @@ struct MainContainerView: View {
                 case .add:
                     AddItemEntryView(appViewModel: appViewModel)
                 case .lists:
-                    ListView()
+                    ListView(viewModel: appViewModel)
                 case .settings:
                     ProfileView(authViewModel: authViewModel, appViewModel: appViewModel)
                 }
@@ -26,8 +26,7 @@ struct MainContainerView: View {
             
             // Fixed Bottom Tab Bar
             CustomTabBar(selectedTab: $appViewModel.selectedTab) {
-                // Action for the floating "+" button
-                appViewModel.selectedTab = .add
+                appViewModel.startAddingItem()
             }
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)

@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct ShoppingModeView: View {
-    @ObservedObject var viewModel: ListViewModel
+    @ObservedObject var viewModel: AppViewModel
+    @State private var newItemName = ""
     
     var body: some View {
         VStack(spacing: 24) {
@@ -19,9 +20,9 @@ struct ShoppingModeView: View {
             
             // List Items
             VStack(spacing: 12) {
-                ForEach(viewModel.shoppingItems) { item in
+                ForEach($viewModel.shoppingItems) { $item in
                     HStack {
-                        Button { viewModel.toggleShoppingItem(item.id) } label: {
+                        Button { item.isChecked.toggle() } label: {
                             Image(systemName: item.isChecked ? "checkmark.circle.fill" : "circle")
                                 .font(.system(size: 24))
                                 .foregroundColor(item.isChecked ? .black : .gray)
@@ -33,18 +34,7 @@ struct ShoppingModeView: View {
                         
                         Spacer()
                         
-                        // Custom Binding-like logic for Stepper in row
-                        HStack(spacing: 12) {
-                            Button { viewModel.updateQuantity(for: item.id, increment: false) } label: {
-                                Image(systemName: "minus.circle").foregroundColor(.gray)
-                            }
-                            Text("\(item.quantity)")
-                                .font(AppTheme.bodyFont.bold())
-                                .frame(width: 20)
-                            Button { viewModel.updateQuantity(for: item.id, increment: true) } label: {
-                                Image(systemName: "plus.circle").foregroundColor(.black)
-                            }
-                        }
+                        QuantityStepper(value: $item.quantity, maxValue: 24)
                     }
                     .padding()
                     .background(Color.white)
@@ -53,20 +43,45 @@ struct ShoppingModeView: View {
                 }
                 
                 // Add Item Row
-                Button(action: {}) {
+                HStack(spacing: 12) {
+                    Image(systemName: "plus")
+                        .foregroundColor(.gray)
+
+                    TextField("新增品項", text: $newItemName)
+                        .font(AppTheme.bodyFont)
+                        .submitLabel(.done)
+                        .onSubmit(addShoppingItem)
+
+                    Button(action: addShoppingItem) {
+                        Text("加入")
+                            .font(AppTheme.captionFont.bold())
+                            .foregroundColor(.black)
+                    }
+                    .disabled(newItemName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                .padding()
+                .foregroundColor(.gray)
+                .background(Color.white)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
+                        .foregroundColor(AppTheme.borderColor)
+                )
+
+                NavigationLink(destination: DeclutterView(viewModel: viewModel)) {
                     HStack {
-                        Image(systemName: "plus")
-                        Text("新增品項")
+                        Image(systemName: "leaf")
+                        Text("整理斷捨離清單")
                         Spacer()
+                        Image(systemName: "chevron.right")
                     }
                     .padding()
-                    .foregroundColor(.gray)
+                    .foregroundColor(AppTheme.primaryText)
                     .background(Color.white)
                     .cornerRadius(12)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(style: StrokeStyle(lineWidth: 1, dash: [4]))
-                            .foregroundColor(AppTheme.borderColor)
+                        RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1)
                     )
                 }
             }
@@ -85,5 +100,10 @@ struct ShoppingModeView: View {
             }
             .padding(.horizontal)
         }
+    }
+
+    private func addShoppingItem() {
+        viewModel.addShoppingItem(name: newItemName)
+        newItemName = ""
     }
 }

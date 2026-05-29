@@ -1,12 +1,25 @@
 import SwiftUI
 
 struct DeclutterSettingsView: View {
-    @State private var reason = ""
-    @State private var lastUsed = Date()
-    @State private var cycle = "3 個月"
-    @State private var message = ""
+    @ObservedObject var viewModel: AppViewModel
+    let item: DeclutterItem
+
+    @State private var reason: String
+    @State private var lastUsed: Date
+    @State private var cycle: String
+    @State private var message: String
+    @Environment(\.dismiss) private var dismiss
     
     let cycles = ["1 個月", "3 個月", "6 個月", "1 年"]
+
+    init(viewModel: AppViewModel, item: DeclutterItem) {
+        self.viewModel = viewModel
+        self.item = item
+        _reason = State(initialValue: item.reason)
+        _lastUsed = State(initialValue: item.lastUsedDate ?? Date())
+        _cycle = State(initialValue: item.reminderCycle)
+        _message = State(initialValue: item.futureMessage)
+    }
     
     var body: some View {
         ScrollView {
@@ -81,7 +94,16 @@ struct DeclutterSettingsView: View {
                 }
                 .padding(.horizontal)
                 
-                PrimaryButton(title: "儲存設定", action: {})
+                PrimaryButton(title: "儲存設定", action: {
+                    viewModel.updateDeclutterSettings(
+                        for: item.id,
+                        reason: reason,
+                        lastUsedDate: lastUsed,
+                        reminderCycle: cycle,
+                        futureMessage: message
+                    )
+                    dismiss()
+                })
                     .padding(.horizontal)
                 
                 Spacer(minLength: 40)

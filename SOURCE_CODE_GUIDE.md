@@ -106,12 +106,16 @@
 `AppViewModel` 是 app 的主要狀態中心：
 
 - `selectedTab`
+- `selectedListMode`
 - `currentUser`
 - `spaces`
 - `items`
+- `shoppingItems`
+- `declutterTodos`
 - `notifications`
 - `declutterItems`
 - `achievements`
+- `pendingAddSpaceId`
 
 Dashboard 用的 computed properties 也在這裡：
 
@@ -119,36 +123,35 @@ Dashboard 用的 computed properties 也在這裡：
 - `expiringSoonItems`
 - `shoppingListCount`
 - `declutterTodoCount`
+- `shoppingProgress`
+- `declutterProgress`
 
-它也提供基本 CRUD：
+它也提供主要 mock state 操作：
 
 - `addItem`
 - `updateItem`
 - `deleteItem`
 - `itemsForSpace`
+- `startAddingItem(in:)`
+- `addSpace(name:)`
+- `toggleShoppingItem`
+- `updateShoppingItemQuantity`
+- `addShoppingItem`
+- `toggleDeclutterTodo`
+- `addDeclutterItem`
+- `updateDeclutterSettings`
 
-目前 `shoppingListCount` 直接讀 `MockData.shared.shoppingItems.count`，不是跟 `ListViewModel.shoppingItems` 同步，所以清單頁如果改動購物清單，Dashboard 數字不會跟著變。
-
-`ListViewModel` 是清單頁局部狀態：
-
-- `selectedMode`
-- `shoppingItems`
-- `declutterTodos`
-- progress 字串。
-- toggle checked。
-- 更新購物品項數量。
-- 新增購物品項。
-
-它是由 `ListView` 用 `@StateObject` 自己建立，所以它不是 app-wide 狀態。
+購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的購物清單數字與清單頁會讀同一份 live state。`MockData.shared` 仍只負責提供初始資料。
 
 `AddItemViewModel` 管新增物品流程：
 
-- 輸入文字、品名、數量、單位、到期日、空間、是否耗材。
+- 輸入文字、品名、數量、單位、到期日、空間、位置、是否耗材、提醒門檻。
 - `parseNaturalLanguage()` mock 自然語言解析。
 - `mockCameraRecognition()` mock 相機辨識。
+- `syncSpaces(_:)` 和 `preselectSpace(_:)`。
 - `reset()`。
 
-目前解析邏輯只特別處理文字包含「牛奶」的情境；相機辨識固定輸出「林鳳營鮮乳」。兩者都把到期日寫成 2024/05/02，這在目前日期下已經是過去日期，但 UI 還是會照樣顯示。
+目前解析邏輯只特別處理文字包含「牛奶」的情境；相機辨識固定輸出「林鳳營鮮乳」。到期日會用下一個未來的 5/2，避免再產生 2024/05/02 這類過期 mock date。
 
 ## 主要畫面流程
 
@@ -159,7 +162,7 @@ Dashboard 用的 computed properties 也在這裡：
 - `Views/Auth/LoginView.swift`
 - `Views/Auth/RegisterView.swift`
 
-`LoginView` 用 `@StateObject var viewModel: AuthViewModel` 接收外部傳入的 `AuthViewModel`，這種寫法比較不典型；因為它不是自己擁有的 model，通常會用 `@ObservedObject`。不過目前功能上可運作。
+`LoginView` 用 `@ObservedObject var viewModel: AuthViewModel` 接收 root 建立的 `AuthViewModel`。
 
 ### Dashboard
 
@@ -171,12 +174,13 @@ Dashboard 用的 computed properties 也在這裡：
 Dashboard 顯示：
 
 - 歡迎使用者。
+- 「庫存模式」大卡。
 - 統計卡片：購物清單、斷捨離清單、低庫存、即將過期。
 - 橫向低庫存物品。
 - 橫向即將到期物品。
 - 提醒中心通知。
 
-物品卡用 `Components/StickerItemCard.swift`。
+物品卡用 `Components/StickerItemCard.swift`。購物清單統計可直接切到購物模式；斷捨離統計可進入 `DeclutterView`。
 
 ### 空間頁
 
@@ -193,7 +197,7 @@ viewModel.itemsForSpace(space.id)
 
 從全域 `items` 過濾該空間的物品。
 
-「新增空間分類」按鈕目前是空 action。空間詳情裡「新增物品」會切到 `.add` tab，但沒有把目前 space 預選帶入新增流程。
+「新增空間分類」會開啟 sheet 建立 mock 空間。空間詳情裡「新增物品」會切到 `.add` tab，並透過 `pendingAddSpaceId` 預選目前空間。
 
 ### 新增物品
 
@@ -214,7 +218,7 @@ viewModel.itemsForSpace(space.id)
 6. 呼叫 `appViewModel.addItem(newItem)`。
 7. 切回首頁。
 
-關鍵新增邏輯在 `AddItemConfirmView`。目前新增後沒有呼叫 `viewModel.reset()`，所以如果下一次再進入新增流程，可能保留上一次輸入狀態，因為 `AddItemEntryView` 持有的是 `@StateObject`。
+關鍵新增邏輯在 `AddItemConfirmView`。確認頁已改為 compact row layout，包含數量 stepper、compact date picker、空間、位置、耗品 toggle 與提醒門檻。成功新增後會呼叫 `reset()` 並切回首頁。
 
 ### 清單頁
 
@@ -229,7 +233,7 @@ viewModel.itemsForSpace(space.id)
 - 清單模式：購物清單卡、斷捨離待辦卡、建議購入、建議斷捨離。
 - 購物模式：購物清單 row，可勾選與調整數量。
 
-「新增品項」按鈕目前是空 action。元件 `QuantityStepper` 已存在，但購物模式目前是直接手寫 plus/minus button，沒有使用這個共用元件。
+清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並支援在清單底部新增購物品項。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
 
 ### 斷捨離頁
 
@@ -239,7 +243,7 @@ viewModel.itemsForSpace(space.id)
 - `Views/Declutter/DeclutterDetailView.swift`
 - `Views/Declutter/DeclutterSettingsView.swift`
 
-這組畫面本身完整，但目前沒有被 `MainContainerView` 的 tab switch 接上，所以一般使用者從 app 主流程進不到 `DeclutterView`。只有 Dashboard 顯示斷捨離統計，List 顯示一些斷捨離待辦。
+`DeclutterView` 可從 Dashboard 的斷捨離統計卡與清單頁進入。斷捨離清單支援新增 mock 項目；設定頁會把原因、上次使用時間、提醒週期與給未來自己的訊息寫回 `AppViewModel.declutterItems`。
 
 ### Profile
 
@@ -276,7 +280,7 @@ Theme 在 `Theme/AppTheme.swift`，定義：
 - `StatusBadge`：狀態膠囊。
 - `AddPlaceholderCard`：虛線新增卡。
 - `SectionHeader`：區塊標題。
-- `QuantityStepper`：數量加減器，目前未被使用。
+- `QuantityStepper`：數量加減器，用於購物模式與新增物品確認表單。
 
 ## Xcode Project 狀態
 
@@ -288,34 +292,25 @@ Theme 在 `Theme/AppTheme.swift`，定義：
 - `SWIFT_VERSION = 5.0`
 - `IPHONEOS_DEPLOYMENT_TARGET = 26.5`
 - 沒看到測試 target。
-- `ContentView.swift` 仍是 Xcode template 的 Hello World，沒有被 app 入口使用。
+- `ContentView.swift` 已改為 preview-friendly root wrapper，app 入口仍使用 `InStockApp` 注入全域狀態。
 
 ## 目前值得注意的設計與技術債
 
-1. `DeclutterView` 尚未接入主導航。
-   `AppTab` 沒有 declutter tab，`MainContainerView` 也沒有 route 到它。
+1. 視覺資產仍未完整導入。
+   商品貼紙與空間線稿仍主要以 emoji / ASCII / SF Symbols 暫代，和設計稿的實物圖與線稿還有距離。
 
-2. Dashboard 的購物清單數量不是 live state。
-   `AppViewModel.shoppingListCount` 讀 `MockData.shared.shoppingItems.count`，不會反映 `ListViewModel` 的修改。
+2. 自然語言與相機辨識仍是 mock。
+   目前只覆蓋少數固定結果，尚未接真實 NLP、camera session 或 OCR。
 
-3. 新增物品流程不會重置表單。
-   成功新增後只切回首頁，沒有 reset `AddItemViewModel`。
+3. App state 尚未持久化。
+   `AppViewModel` 已收斂主要 mock state，但資料重啟後仍會回到 `MockData` 初始值。
 
-4. 部分按鈕尚未實作。
-   例如新增空間、購物清單新增品項、斷捨離新增項目、儲存斷捨離設定。
-
-5. 資料分散在 mock 與多個 ViewModel。
-   庫存資料在 `AppViewModel`，購物清單在 `ListViewModel`，兩者沒有同步來源。之後若要接資料庫，建議抽一層 repository 或 store。
-
-6. 日期 mock 已過期。
-   新增流程和通知文字使用 2024/05/02 或 5/2，現在會顯得不合理。
-
-7. `Space.items` 欄位目前實際沒用。
+4. `Space.items` 欄位目前實際沒用。
    真正物品歸屬是 `Item.spaceId`。建議保留一種資料關聯方式即可。
 
-8. `LoginView` 對外部傳入 ViewModel 使用 `@StateObject`。
-   語意上較適合 `@ObservedObject`，因為生命週期是由 app root 建立並注入。
+5. 尚未建立 test target。
+   建議下一步補 XCTest target，優先測 `AppViewModel` 的新增、更新與清單操作。
 
 ## 總結
 
-整體來看，這是一個完成度偏 prototype / UI mock 的 SwiftUI app：畫面與資料模型已經鋪好，使用者可走登入、Dashboard、空間、清單、新增物品、個人頁等主要流程；下一階段的重點會是把 mock state 收斂成單一資料來源、補齊未實作 actions、接上斷捨離主流程，然後再加測試與持久化。
+整體來看，這是一個完成度偏 prototype / UI mock 的 SwiftUI app：畫面與資料模型已經鋪好，使用者可走登入、Dashboard、空間、清單、新增物品、斷捨離、個人頁等主要流程；下一階段的重點會是導入視覺資產、加入持久化、替換 mock 辨識流程，然後補測試。

@@ -3,7 +3,6 @@ import SwiftUI
 struct SpaceDetailView: View {
     @ObservedObject var viewModel: AppViewModel
     let space: Space
-    @Environment(\.dismiss) var dismiss
     
     var body: some View {
         ScrollView {
@@ -30,10 +29,11 @@ struct SpaceDetailView: View {
                 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                     // Add Item in this space
-                    AddPlaceholderCard(text: "新增物品")
-                        .onTapGesture {
-                            viewModel.selectedTab = .add
-                        }
+                    Button {
+                        viewModel.startAddingItem(in: space.id)
+                    } label: {
+                        AddPlaceholderCard(text: "新增物品")
+                    }
                     
                     ForEach(items) { item in
                         StickerItemCard(item: item)

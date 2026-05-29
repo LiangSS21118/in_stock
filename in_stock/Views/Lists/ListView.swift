@@ -1,52 +1,54 @@
 import SwiftUI
 
 struct ListView: View {
-    @StateObject var viewModel = ListViewModel()
-    
+    @ObservedObject var viewModel: AppViewModel
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            VStack(spacing: 16) {
-                HStack {
-                    Text("清單")
-                        .font(AppTheme.titleFont)
-                    Spacer()
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 20))
-                }
-                .padding(.horizontal)
-                
-                // Segmented Control
-                HStack(spacing: 0) {
-                    TabButton(title: "清單模式", isSelected: viewModel.selectedMode == .checklist) {
-                        viewModel.selectedMode = .checklist
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Header
+                VStack(spacing: 16) {
+                    HStack {
+                        Text("清單")
+                            .font(AppTheme.titleFont)
+                        Spacer()
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 20))
                     }
-                    TabButton(title: "購物模式", isSelected: viewModel.selectedMode == .shopping) {
-                        viewModel.selectedMode = .shopping
+                    .padding(.horizontal)
+
+                    // Segmented Control
+                    HStack(spacing: 0) {
+                        TabButton(title: "清單模式", isSelected: viewModel.selectedListMode == .checklist) {
+                            viewModel.selectedListMode = .checklist
+                        }
+                        TabButton(title: "購物模式", isSelected: viewModel.selectedListMode == .shopping) {
+                            viewModel.selectedListMode = .shopping
+                        }
                     }
+                    .background(Color.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppTheme.borderColor, lineWidth: 1)
+                            .padding(.horizontal)
+                    )
                 }
-                .background(Color.white)
-                .cornerRadius(12)
-                .padding(.horizontal)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(AppTheme.borderColor, lineWidth: 1)
-                        .padding(.horizontal)
-                )
-            }
-            .padding(.vertical, 20)
-            .background(AppTheme.backgroundColor)
-            
-            // Content
-            ScrollView {
-                if viewModel.selectedMode == .checklist {
-                    ChecklistModeView(viewModel: viewModel)
-                } else {
-                    ShoppingModeView(viewModel: viewModel)
+                .padding(.vertical, 20)
+                .background(AppTheme.backgroundColor)
+
+                // Content
+                ScrollView {
+                    if viewModel.selectedListMode == .checklist {
+                        ChecklistModeView(viewModel: viewModel)
+                    } else {
+                        ShoppingModeView(viewModel: viewModel)
+                    }
+                    Spacer(minLength: 100)
                 }
-                Spacer(minLength: 100)
+                .background(AppTheme.backgroundColor)
             }
-            .background(AppTheme.backgroundColor)
         }
     }
 }
@@ -55,7 +57,7 @@ struct TabButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Text(title)

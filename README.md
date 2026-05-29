@@ -8,9 +8,9 @@
 - 首頁 Dashboard：顯示購物清單、斷捨離、低庫存、即將過期等摘要。
 - 提醒中心：低庫存、即將到期、斷捨離待辦等通知卡片。
 - 空間管理：以廚房、客廳、臥室、浴室分類展示物品。
-- 新增物品：包含自然語言輸入與相機辨識的 mock 流程。
-- 清單：支援清單模式與購物模式切換。
-- 斷捨離：包含清單、詳情與設定畫面雛形。
+- 新增物品：包含自然語言輸入、相機辨識、確認表單與空間預選的 mock 流程。
+- 清單：支援清單模式、購物模式、數量 stepper 與新增購物品項。
+- 斷捨離：包含清單、詳情、設定儲存與新增項目。
 - 個人頁：顯示使用者資訊、成就與下一個里程碑。
 
 ## 專案結構
@@ -24,7 +24,7 @@ in_stock/
 │   ├── Theme/             # Shared colors, fonts, and view styles
 │   ├── ViewModels/        # Observable state and mock operations
 │   ├── Views/             # Feature views
-│   ├── ContentView.swift  # Xcode template view, currently unused
+│   ├── ContentView.swift  # Preview-friendly root wrapper
 │   └── in_stockApp.swift  # App entry point
 ├── blueprint/             # APP design mockups
 ├── in_stock.xcodeproj/    # Xcode project
@@ -55,7 +55,7 @@ xcodebuild -project in_stock.xcodeproj -scheme in_stock -destination 'platform=i
 
 - 尚未接後端、資料庫或真實持久化。
 - 登入、自然語言解析、相機辨識皆為 mock。
-- 多個新增 / 儲存按鈕仍是 placeholder action。
+- 新增空間、購物品項、斷捨離項目與斷捨離設定已具備 mock 操作。
 - 設計稿中的實物圖片與線稿資產尚未完整導入。
 - 尚未建立 XCTest test target。
 
@@ -79,15 +79,14 @@ xcodebuild -project in_stock.xcodeproj -scheme in_stock -destination 'platform=i
 - App 入口為 `InStockApp`，會注入 `AuthViewModel` 與 `AppViewModel`。
 - 主畫面由 `MainContainerView` 透過 `AppTab` 切換。
 - 初始資料集中在 `MockData.shared`。
-- 目前庫存資料以 `AppViewModel.items` 為主，透過 `Item.spaceId` 關聯空間。
+- 目前庫存、購物清單、斷捨離清單與斷捨離待辦狀態集中在 `AppViewModel`。
+- 庫存資料以 `AppViewModel.items` 為主，透過 `Item.spaceId` 關聯空間。
 - `Space.items` 欄位目前未被主要流程使用。
-- `DeclutterView` 已存在，但尚未接入主 tab 流程。
+- `DeclutterView` 可由 Dashboard 統計卡與清單頁進入。
 
 ## 建議後續工作
 
-1. 接上斷捨離主流程。
-2. 將購物清單狀態收斂到共享 store，避免 Dashboard 和清單頁不同步。
-3. 補齊新增空間、新增品項、新增斷捨離項目與儲存設定。
-4. 導入商品貼紙圖與空間線稿圖，取代 emoji / ASCII placeholder。
-5. 調整新增物品確認表單，使其更接近設計稿。
-6. 新增 test target，優先測 ViewModel 與資料操作邏輯。
+1. 導入商品貼紙圖與空間線稿圖，取代 emoji / ASCII placeholder。
+2. 補上資料持久化，避免每次啟動回到 `MockData` 初始狀態。
+3. 將自然語言解析、相機辨識與提醒推播替換為真實服務。
+4. 新增 test target，優先測 `AppViewModel` 與資料操作邏輯。

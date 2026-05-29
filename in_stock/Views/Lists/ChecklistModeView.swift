@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ChecklistModeView: View {
-    @ObservedObject var viewModel: ListViewModel
+    @ObservedObject var viewModel: AppViewModel
     
     var body: some View {
         VStack(spacing: 24) {
@@ -20,6 +20,17 @@ struct ChecklistModeView: View {
                     ChecklistRow(title: item.name, isChecked: item.isChecked) {
                         viewModel.toggleDeclutterTodo(item.id)
                     }
+                }
+
+                NavigationLink(destination: DeclutterView(viewModel: viewModel)) {
+                    HStack {
+                        Image(systemName: "arrow.right.circle")
+                        Text("查看斷捨離清單")
+                        Spacer()
+                    }
+                    .font(AppTheme.captionFont.bold())
+                    .foregroundColor(AppTheme.primaryText)
+                    .padding(.top, 4)
                 }
             }
             

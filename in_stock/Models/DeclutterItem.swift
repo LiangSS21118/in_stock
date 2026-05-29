@@ -9,18 +9,18 @@ struct DeclutterItem: Identifiable {
     var action: DeclutterAction
     var reason: String
     var lastUsedDate: Date?
-    var reminderCycle: String // e.g., "3個月"
+    var reminderCycle: String // e.g., "3 個月"
     var futureMessage: String
-    
-    init(id: UUID = UUID(), 
-         name: String, 
-         imageName: String, 
-         locationText: String, 
-         createdAt: Date = Date(), 
-         action: DeclutterAction, 
-         reason: String = "", 
-         lastUsedDate: Date? = nil, 
-         reminderCycle: String = "3個月", 
+
+    init(id: UUID = UUID(),
+         name: String,
+         imageName: String,
+         locationText: String,
+         createdAt: Date = Date(),
+         action: DeclutterAction,
+         reason: String = "",
+         lastUsedDate: Date? = nil,
+         reminderCycle: String = "3 個月",
          futureMessage: String = "") {
         self.id = id
         self.name = name
