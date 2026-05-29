@@ -134,11 +134,11 @@ Reference: `blueprint/04-lists-shopping-mode.png`
 目前實作：
 
 - 一般狀態下 `ListView` 仍有 segmented control。
-- 進入購物模式時啟動柔性專注：隱藏 segmented control 與搜尋，保留底部 tab，但暫離會提示確認。
+- 進入購物模式時啟動柔性專注：隱藏 segmented control 與搜尋，頂部顯示專注狀態，保留底部 tab。
 - `ChecklistModeView` 有購物清單、斷捨離待辦、建議購入、建議斷捨離。
 - `ShoppingModeView` 聚焦為購物清單與斷捨離清單，提供 `QuantityStepper`、新增品項列、低庫存快速加入。
 - 低庫存快速加入會帶入 `sourceItemId`，同來源或同名項目以數量遞增方式合併。
-- `RestockConfirmationView` 支援「購物完畢」回補流程：已匹配項目回補原庫存，未匹配項目可補空間/位置或略過。
+- `RestockConfirmationView` 支援「購物完畢」回補流程：已匹配項目回補原庫存，未匹配項目可自選空間與位置回補，或略過。
 - 清單狀態已收斂到 `AppViewModel`，Dashboard 與清單頁讀同一份資料。
 
 主要偏差：
@@ -148,7 +148,7 @@ Reference: `blueprint/04-lists-shopping-mode.png`
 - 設計稿建議卡使用實物圖片；目前仍以 emoji 為主。
 - checklist 日期、progress 有做，但部分內容是硬編碼。
 
-完成度：**約 85%**。功能流程已超過原稿深度，但視覺細節和素材仍需補強。
+完成度：**約 90%**。功能流程已顯著超過原稿深度，整體採買閉環已成形。
 
 ## 05 斷捨離 / 設定成就
 
