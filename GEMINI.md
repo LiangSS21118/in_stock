@@ -44,20 +44,21 @@ There is currently no backend, database, network layer, real persistence, push n
 - Spaces
 - Add Item
 - Lists
-- Profile
+- Profile (Settings)
 
-`DeclutterView` and related decluttering screens exist, but the main tab flow currently does not expose a dedicated decluttering tab.
+`DeclutterView` and related decluttering screens can be accessed from the Dashboard (Declutter stat card) or the Lists tab (Checklist mode).
 
 ## Current Implementation Notes
 
 - `MockData.shared` is a data factory. Its collections are computed properties and should not be treated as persistent storage.
 - App-wide inventory state lives in `AppViewModel.items`.
-- Space-to-item ownership is represented only by `Item.spaceId`; `Space` stores display metadata and placeholder artwork, not a second item array.
+- Space-to-item ownership is represented only by `Item.spaceId`; `Space` stores display metadata and placeholder ASCII art.
 - Dashboard, checklist mode, and shopping mode all read shared list state from `AppViewModel`.
 - Shopping-mode row actions and quantity adjustments go through `AppViewModel` methods; quantity adjustment is disabled for checked items.
 - Shopping mode includes a "Soft Focus" state: hiding non-essential UI (segmented control, search) while keeping navigation accessible.
 - Search functionality is enabled in `ListView` and `SpaceView`, allowing real-time filtering of items and shopping list entries.
 - Shopping completed flow uses `ShoppingRestockEntry` to match items; matched items increment inventory quantity and reset remaining percentage to 100%. Unmatched items can be added as new inventory with space/location selection.
+- `AchievementView` displays a grid of `doneDeclutterItems` as sticker cards, celebrating successfully decluttered items.
 - Dashboard shopping card is dynamic, showing "Continue Shopping" when focus is active.
 - Add item flows are mock implementations: natural language parsing and camera recognition use hardcoded behavior with `nextFutureDate` logic to avoid expired dates.
 - Adding spaces, shopping items, declutter items, and declutter settings all have mock state updates using `String.trimmedForUserInput`.

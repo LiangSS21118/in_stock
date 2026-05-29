@@ -56,7 +56,6 @@
 ## 資料模型
 
 核心 enum 在 `Models/Enums.swift`：
-
 - `ItemStatus`：在庫、低庫存、即將到期、已到期。
 - `ReminderType`：低庫存、即將到期、購物模式、斷捨離、推播。
 - `ListMode`：清單模式、購物模式。
@@ -64,7 +63,6 @@
 - `AppTab`：底部 tab 狀態。
 
 核心庫存模型是 `Models/Item.swift`。它包含：
-
 - `name`、`imageName`：顯示名稱與 emoji 圖示。
 - `quantity`、`unit`：數量與單位。
 - `remainingPercentage`：剩餘比例。
@@ -74,14 +72,15 @@
 - `isConsumable`：是否耗材。
 - `reminderThreshold`：提醒門檻。
 - `status`：庫存狀態。
+- `createdAt`：建立時間。
 
-其他模型都很薄：
-
+其他模型：
 - `Space`：空間分類，包含 icon name 與 ASCII placeholder art。
 - `ShoppingListItem`：購物清單項目。
+- `ShoppingRestockEntry`：購物完畢後的回補預覽模型。
 - `DeclutterItem`：斷捨離項目。
 - `NotificationItem`：提醒中心通知。
-- `Achievement`：個人成就。
+- `Achievement`：個人成就統計。
 - `User`：使用者資料。
 
 空間與物品的關聯只有一個來源：真正的庫存清單在 `AppViewModel.items`，並透過 `Item.spaceId` 過濾到對應空間。`Space` 不再保存自己的 item array，避免和 app-wide inventory state 產生雙重來源。
@@ -91,21 +90,21 @@
 所有初始資料集中在 `Data/MockData.swift`。
 
 它提供：
-
 - 使用者：`currentUser`。
 - 空間：廚房、客廳、臥室、浴室。
 - 庫存品項：牛奶、吐司、雞蛋、洗衣精、衛生紙等。
 - 購物清單：牛奶、雞蛋、洗衣精、牙膏。
+- 斷捨離待辦：玄關備用傘、重複購買的馬克杯。
 - 斷捨離項目：米色大衣、相機、運動鞋、加濕器。
+- 已完成斷捨離項目：提供 8 項預設已完成項目用於成就展示。
 - 通知：牛奶到期、洗衣精低庫存、斷捨離待辦。
-- 成就：斷捨離件數、騰出空間、持續天數。
+- 成就統計：斷捨離件數、騰出空間、持續天數。
 
 這裡有一個重要特性：`spaces`、`items`、`shoppingItems` 等都是 computed property，每次取用都會重新產生資料。`MockData.shared` 本身不是資料庫，只是資料工廠。
 
 ## ViewModel 導讀
 
 `AuthViewModel` 管登入狀態：
-
 - `@AppStorage("isLoggedIn")`
 - `@AppStorage("currentUserName")`
 - `@AppStorage("currentUserEmail")`
@@ -114,7 +113,6 @@
 - `logout()` 清掉登入狀態與使用者欄位。
 
 `AppViewModel` 是 app 的主要狀態中心：
-
 - `selectedTab`
 - `selectedListMode`
 - `isShoppingFocusActive`
@@ -125,156 +123,99 @@
 - `declutterTodos`
 - `notifications`
 - `declutterItems`
+- `doneDeclutterItems`：展示在成就頁面的已完成項目。
 - `achievements`
 - `pendingAddSpaceId`
-- `searchText`：搜尋文字，用於過濾庫存物品與購物清單。
+- `searchText`：通用搜尋文字，用於庫存過濾與清單搜尋。
 
 Dashboard 用的 computed properties 也在這裡：
-
 - `lowStockItems`
 - `expiringSoonItems`
-- `shoppingListCount`：計算購物清單中尚未勾選的項目。
-- `declutterTodoCount`：計算斷捨離待辦中尚未勾選的項目。
+- `filteredItems`：根據搜尋文字過濾後的庫存。
+- `filteredShoppingItems`：根據搜尋文字過濾後的購物清單。
+- `shoppingListCount`
+- `declutterTodoCount`
 - `shoppingProgress`
 - `declutterProgress`
 
 它也提供主要 mock state 操作：
-
-- `addItem`
-- `updateItem`
-- `deleteItem`
+- `addItem` / `updateItem` / `deleteItem`
 - `itemsForSpace`
 - `startAddingItem(in:)`
-- `startShoppingMode`
-- `pauseShoppingMode`
-- `finishShoppingMode`
-- `addSpace(name:)`
-- `toggleShoppingItem`
-- `updateShoppingItemQuantity`
-- `setShoppingItemQuantity`
-- `addShoppingItem`
-- `addLowStockItemToShoppingList`
-- `restockEntriesForCompletedShoppingItems`：根據已勾選的購物品項產生回補預覽。若購物品項有 `sourceItemId` 或名稱吻合的庫存，會自動匹配。
-- `restockFromCompletedShoppingItems`：執行回補。已匹配項目會增加庫存數量並將剩餘比例設為 100%；未匹配項目會建立新的 `Item` 並加入指定空間。
-- `toggleDeclutterTodo`
-- `addDeclutterItem`
-- `updateDeclutterSettings`
+- `status(for:remainingPercentage:reminderThreshold:)`：動態計算物品狀態。
+- `addSpace(name:)`：自動生成對應的 ASCII art。
+- `startShoppingMode` / `pauseShoppingMode` / `finishShoppingMode`
+- `toggleShoppingItem` / `setShoppingItemQuantity`
+- `addShoppingItem`：支持名稱匹配遞增。
+- `addLowStockItemToShoppingList`：支持 `sourceItemId` 關聯。
+- `restockEntriesForCompletedShoppingItems`：產生回補預覽與自動匹配。
+- `restockFromCompletedShoppingItems`：執行庫存回補與新物品新增。
+- `addDeclutterItem` / `updateDeclutterSettings`
 
-購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、新增品項、低庫存加入購物清單、以及購物完畢後的回補流程都經由 `AppViewModel` 方法更新，不讓 View 直接持有第二份清單邏輯。`MockData.shared` 仍只負責提供初始資料。
+購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、以及購物完畢後的回補流程都經由 `AppViewModel` 方法更新。
 
 `AddItemViewModel` 管新增物品流程：
-
 - 輸入文字、品名、數量、單位、到期日、空間、位置、是否耗材、提醒門檻。
 - `parseNaturalLanguage()` mock 自然語言解析。
 - `mockCameraRecognition()` mock 相機辨識。
-- `syncSpaces(_:)` 和 `preselectSpace(_:)`。
 - `reset()`。
-
-目前解析邏輯只特別處理文字包含「牛奶」的情境；相機辨識固定輸出「林鳳營鮮乳」。到期日會用下一個未來的 5/2，避免再產生 2024/05/02 這類過期 mock date。
 
 ## 主要畫面流程
 
 ### 登入頁
 
 相關檔案：
-
 - `Views/Auth/LoginView.swift`
 - `Views/Auth/RegisterView.swift`
-
-`LoginView` 用 `@ObservedObject var viewModel: AuthViewModel` 接收 root 建立的 `AuthViewModel`。
 
 ### Dashboard
 
 相關檔案：
-
 - `Views/Dashboard/DashboardView.swift`
 - `Views/Dashboard/ReminderCenterView.swift`
 
-Dashboard 顯示：
-
-- 歡迎使用者。
-- 「購物模式」入口大卡。
-- 統計卡片：購物清單、斷捨離清單、低庫存、即將過期。
-- 橫向低庫存物品。
-- 橫向即將到期物品。
-- 提醒中心通知。
-
-物品卡用 `Components/StickerItemCard.swift`。購物模式入口與購物清單統計都可直接呼叫 `startShoppingMode()`；斷捨離統計可進入 `DeclutterView`。
+顯示統計、購物入口、快用完與即將過期列表、以及提醒中心。購物入口會根據 `isShoppingFocusActive` 動態切換顯示文字。
 
 ### 空間頁
 
 相關檔案：
-
 - `Views/Spaces/SpaceView.swift`
 - `Views/Spaces/SpaceDetailView.swift`
 
-`SpaceView` 顯示空間 grid。支援搜尋功能，啟動搜尋後會隱藏空間 grid 並顯示符合關鍵字的庫存物品 grid。每個空間點進去後，`SpaceDetailView` 透過：
-
-```swift
-viewModel.itemsForSpace(space.id)
-```
-
-從全域 `items` 過濾該空間的物品。
-
-「新增空間分類」會開啟 sheet 建立 mock 空間。空間詳情裡「新增物品」會切到 `.add` tab，並透過 `pendingAddSpaceId` 預選目前空間。
+`SpaceView` 支援搜尋，搜尋時顯示物品 grid，平時顯示空間 grid。`SpaceDetailView` 顯示特定空間的所有物品。
 
 ### 新增物品
 
 相關檔案：
-
 - `Views/AddItem/AddItemEntryView.swift`
-- `Views/AddItem/NaturalLanguageInputView.swift`
-- `Views/AddItem/CameraRecognitionView.swift`
-- `Views/AddItem/AddItemConfirmView.swift`
+- `Views/AddItem/AddItemConfirmView.swift`等
 
-流程是：
-
-1. 進入新增入口，選自然語言或相機。
-2. mock 解析或 mock 辨識。
-3. 進入確認表單。
-4. 點「新增到庫存」。
-5. 建立 `Item`。
-6. 呼叫 `appViewModel.addItem(newItem)`。
-7. 切回首頁。
-
-關鍵新增邏輯在 `AddItemConfirmView`。確認頁已改為 compact row layout，包含數量 stepper、compact date picker、空間、位置、耗品 toggle 與提醒門檻。成功新增後會呼叫 `reset()` 並切回首頁。
+流程包含自然語言/相機入口與確認表單。確認表單已優化為 compact row layout。
 
 ### 清單頁
 
 相關檔案：
-
 - `Views/Lists/ListView.swift`
-- `Views/Lists/ChecklistModeView.swift`
 - `Views/Lists/ShoppingModeView.swift`
-- `Views/Lists/RestockConfirmationView.swift`
+- `Views/Lists/RestockConfirmationView.swift`等
 
-`ListView` 內建 segmented control，切換：
-
-- 清單模式：支援紙張風購物清單與斷捨離待辦卡。支援搜尋功能以從庫存中尋找品項並加入清單。新增動態日期顯示與 empty state。建議購入與建議斷捨離項改為可點選加入。
-- 購物模式：支援數量 stepper（已勾選項目會停用調整）、新增品項列、低庫存快速加入。同樣支援搜尋物品加入功能。
-- 柔性專注：購物中啟動「專注模式」，隱藏 segmented control 與搜尋入口，頂部顯示專注狀態，保留底部 tab 以維持導覽彈性。從 Dashboard 進入會自動啟動，手動切換則提供開啟按鈕。
-- 購物完畢：在購物模式底部顯示，當有項目勾選時啟用。進入 `RestockConfirmationView` 回補確認頁，已匹配項目可回補原庫存，未匹配項目可自選空間 / 位置新增到庫存，或選擇略過。
-
-清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並透過 `AppViewModel.setShoppingItemQuantity(for:quantity:)` 更新數量，避免 View 直接修改 `shoppingItems` 陣列元素。低庫存快速加入會寫入 `ShoppingListItem.sourceItemId`，同來源或同名品項會改為增量，不重複新增列。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
+支持清單與購物兩種模式。購物模式下可開啟「專注狀態」。支援搜尋庫存物品加入。購物完畢後會跳出回補確認視窗。
 
 ### 斷捨離頁
 
 相關檔案：
-
 - `Views/Declutter/DeclutterView.swift`
-- `Views/Declutter/DeclutterDetailView.swift`
 - `Views/Declutter/DeclutterSettingsView.swift`
 
-`DeclutterView` 可從 Dashboard 的斷捨離統計卡與清單頁進入。斷捨離清單支援新增 mock 項目；設定頁會把原因、上次使用時間、提醒週期與給未來自己的訊息寫回 `AppViewModel.declutterItems`。
+管理待處理的斷捨離項目，並可設定處理細節。
 
-### Profile
+### Profile & 成就
 
 相關檔案：
-
 - `Views/Profile/ProfileView.swift`
 - `Views/Profile/AchievementView.swift`
 
-Profile 顯示目前登入名稱、email、設定列、登出按鈕，以及成就卡。登出後 `RootView` 會因 `isLoggedIn` 變成 false 回到登入頁。
+Profile 提供帳戶設定。`AchievementView` 使用貼紙卡 grid 展示已完成的斷捨離項目，並配有 ASCII 獎盃 header。
 
 ## 共用元件與樣式
 
