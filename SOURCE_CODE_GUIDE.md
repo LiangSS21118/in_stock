@@ -115,6 +115,7 @@
 
 - `selectedTab`
 - `selectedListMode`
+- `isShoppingFocusActive`
 - `currentUser`
 - `spaces`
 - `items`
@@ -141,16 +142,22 @@ Dashboard 用的 computed properties 也在這裡：
 - `deleteItem`
 - `itemsForSpace`
 - `startAddingItem(in:)`
+- `startShoppingMode`
+- `pauseShoppingMode`
+- `finishShoppingMode`
 - `addSpace(name:)`
 - `toggleShoppingItem`
 - `updateShoppingItemQuantity`
 - `setShoppingItemQuantity`
 - `addShoppingItem`
+- `addLowStockItemToShoppingList`
+- `restockEntriesForCompletedShoppingItems`
+- `restockFromCompletedShoppingItems`
 - `toggleDeclutterTodo`
 - `addDeclutterItem`
 - `updateDeclutterSettings`
 
-購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、新增品項都經由 `AppViewModel` 方法更新，不讓 View 直接持有第二份清單邏輯。`MockData.shared` 仍只負責提供初始資料。
+購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、新增品項、低庫存加入購物清單、以及購物完畢後的回補流程都經由 `AppViewModel` 方法更新，不讓 View 直接持有第二份清單邏輯。`MockData.shared` 仍只負責提供初始資料。
 
 `AddItemViewModel` 管新增物品流程：
 
@@ -183,13 +190,13 @@ Dashboard 用的 computed properties 也在這裡：
 Dashboard 顯示：
 
 - 歡迎使用者。
-- 「庫存模式」大卡。
+- 「購物模式」入口大卡。
 - 統計卡片：購物清單、斷捨離清單、低庫存、即將過期。
 - 橫向低庫存物品。
 - 橫向即將到期物品。
 - 提醒中心通知。
 
-物品卡用 `Components/StickerItemCard.swift`。購物清單統計可直接切到購物模式；斷捨離統計可進入 `DeclutterView`。
+物品卡用 `Components/StickerItemCard.swift`。購物模式入口與購物清單統計都可直接呼叫 `startShoppingMode()`；斷捨離統計可進入 `DeclutterView`。
 
 ### 空間頁
 
@@ -236,13 +243,16 @@ viewModel.itemsForSpace(space.id)
 - `Views/Lists/ListView.swift`
 - `Views/Lists/ChecklistModeView.swift`
 - `Views/Lists/ShoppingModeView.swift`
+- `Views/Lists/RestockConfirmationView.swift`
 
 `ListView` 內建 segmented control，切換：
 
 - 清單模式：購物清單卡、斷捨離待辦卡、建議購入、建議斷捨離。
-- 購物模式：購物清單 row，可勾選與調整數量。
+- 購物模式：購物清單 row、低庫存快速加入、斷捨離待辦精簡檢視。
+- 柔性專注：購物中隱藏 segmented control 與搜尋入口，保留底部 tab，但暫離前會提示確認。
+- 購物完畢：進入回補確認頁，已匹配項目可回補原庫存，未匹配項目可補空間 / 位置或略過。
 
-清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並透過 `AppViewModel.setShoppingItemQuantity(for:quantity:)` 更新數量，避免 View 直接修改 `shoppingItems` 陣列元素。畫面也支援在清單底部新增購物品項。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
+清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並透過 `AppViewModel.setShoppingItemQuantity(for:quantity:)` 更新數量，避免 View 直接修改 `shoppingItems` 陣列元素。低庫存快速加入會寫入 `ShoppingListItem.sourceItemId`，同來源或同名品項會改為增量，不重複新增列。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
 
 ### 斷捨離頁
 

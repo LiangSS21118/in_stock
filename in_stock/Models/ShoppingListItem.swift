@@ -15,3 +15,17 @@ struct ShoppingListItem: Identifiable {
         self.sourceItemId = sourceItemId
     }
 }
+
+struct ShoppingRestockEntry: Identifiable {
+    let id: UUID
+    var name: String
+    var quantity: Int
+    var matchedItemId: UUID?
+    var spaceId: UUID?
+    var locationText: String
+    var shouldRestock: Bool
+
+    var isMatchedToInventory: Bool {
+        matchedItemId != nil
+    }
+}

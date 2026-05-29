@@ -14,7 +14,7 @@
 
 ## 整體結論
 
-目前專案完成度約 **70% - 75%**。主要流程與資訊架構已能完整串起：首頁、空間、清單、新增物品、個人頁、斷捨離相關畫面都有 SwiftUI 實作，且多數 mock 操作已可更新 shared state。但目前仍偏「可操作 prototype + mock UI」，距離設計稿仍有明顯落差，尤其是：
+目前專案完成度約 **75% - 80%**。主要流程與資訊架構已能完整串起：首頁、空間、清單、新增物品、個人頁、斷捨離相關畫面都有 SwiftUI 實作，且多數 mock 操作已可更新 shared state。近期新增了購物專注流程與購物完畢回補庫存，功能完整度提升，但目前仍偏「可操作 prototype + mock UI」，距離設計稿仍有明顯落差，尤其是：
 
 - 設計稿大量使用實物圖片、線稿插圖、貼紙風商品卡；目前幾乎全部用 emoji / SF Symbols / ASCII art 代替。
 - 斷捨離清單已可從 Dashboard 與清單頁進入，但仍不是獨立 tab。
@@ -37,19 +37,20 @@ Reference: `blueprint/01-dashboard-reminders.png`
 目前實作：
 
 - `DashboardView` 已有歡迎文字、統計卡、快用完、即將過期、提醒中心。
-- 首頁已補上「庫存模式」大卡。
+- 首頁已改為「購物模式」入口大卡，點擊後直接進入清單頁購物專注狀態。
 - `ReminderCenterView` 和 `NotificationCard` 已有通知卡片。
 - `AppViewModel.lowStockItems`、`expiringSoonItems` 已能從 mock item 過濾。
 - 購物清單數字已改讀 `AppViewModel.shoppingItems` live state。
 
 主要偏差：
 
+- 原設計稿寫「庫存模式」命名；目前是有意識改成「購物模式」入口，屬產品策略調整而非純視覺偏差。
 - 底部 tab 的第二個 icon 目前是 grid，設計稿是圖片 / 空間 icon 風格，語意略不同。
 - 商品卡目前用 emoji，不是設計稿的實物貼紙圖片。
 - 設計稿首頁商品卡尺寸較小、貼紙陰影明顯；目前 `StickerItemCard` 比較像一般白卡。
 - 提醒卡目前品牌列固定顯示 `In Stock`，但 icon、排版、卡片比例和設計稿不完全一致。
 
-完成度：**約 75%**。資訊與核心卡片結構更完整，但商品素材與提醒卡視覺仍需補強。
+完成度：**約 80%**。首頁流程已升級為購物入口，但商品素材與提醒卡視覺仍需補強。
 
 ## 02 空間 / 物品展示
 
@@ -132,20 +133,22 @@ Reference: `blueprint/04-lists-shopping-mode.png`
 
 目前實作：
 
-- `ListView` 有 segmented control。
+- 一般狀態下 `ListView` 仍有 segmented control。
+- 進入購物模式時啟動柔性專注：隱藏 segmented control 與搜尋，保留底部 tab，但暫離會提示確認。
 - `ChecklistModeView` 有購物清單、斷捨離待辦、建議購入、建議斷捨離。
-- `ShoppingModeView` 有購物清單、checkbox、`QuantityStepper`、新增品項列、建議購入。
+- `ShoppingModeView` 聚焦為購物清單與斷捨離清單，提供 `QuantityStepper`、新增品項列、低庫存快速加入。
+- 低庫存快速加入會帶入 `sourceItemId`，同來源或同名項目以數量遞增方式合併。
+- `RestockConfirmationView` 支援「購物完畢」回補流程：已匹配項目回補原庫存，未匹配項目可補空間/位置或略過。
 - 清單狀態已收斂到 `AppViewModel`，Dashboard 與清單頁讀同一份資料。
-- 購物模式的勾選與數量調整已透過 `AppViewModel` 方法更新，避免 View 直接維護清單操作邏輯。
 
 主要偏差：
 
-- 設計稿清單模式的紙張卡是一大張表格式；目前是兩張 `PaperChecklistCard` 分開呈現。
-- 購物模式設計稿比較像列表，現在每一列是獨立白卡，視覺偏重。
-- 設計稿建議卡使用實物圖片；目前是 emoji。
+- 設計稿假設購物模式只做輕切換；目前已升級為完整採買流程（focus + 回補），屬產品策略加值。
+- 清單模式紙張卡仍非單一大表格式，與設計稿仍有差距。
+- 設計稿建議卡使用實物圖片；目前仍以 emoji 為主。
 - checklist 日期、progress 有做，但部分內容是硬編碼。
 
-完成度：**約 80%**。功能與模式切換最接近設計稿，但視覺細節和建議卡素材仍需補強。
+完成度：**約 85%**。功能流程已超過原稿深度，但視覺細節和素材仍需補強。
 
 ## 05 斷捨離 / 設定成就
 
@@ -210,7 +213,7 @@ Reference: `blueprint/05-declutter-profile.png`
 - 相機辨識與自然語言解析的真實功能。
 - 提醒 / 推播真實機制。
 
-功能完成度：**約 75% - 80%**。
+功能完成度：**約 80% - 85%**。
 
 ## 建議優先修正順序
 

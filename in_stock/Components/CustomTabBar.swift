@@ -1,14 +1,19 @@
 import SwiftUI
 
 struct CustomTabBar: View {
-    @Binding var selectedTab: AppTab
+    let selectedTab: AppTab
+    var selectTab: (AppTab) -> Void
     var addAction: () -> Void
     
     var body: some View {
         HStack {
-            TabBarButton(icon: "house", tab: .home, selectedTab: $selectedTab)
+            TabBarButton(icon: "house", isSelected: selectedTab == .home) {
+                selectTab(.home)
+            }
             Spacer()
-            TabBarButton(icon: "square.grid.2x2", tab: .spaces, selectedTab: $selectedTab)
+            TabBarButton(icon: "square.grid.2x2", isSelected: selectedTab == .spaces) {
+                selectTab(.spaces)
+            }
             Spacer()
             
             // Floating + Button
@@ -24,9 +29,13 @@ struct CustomTabBar: View {
             .offset(y: -20)
             
             Spacer()
-            TabBarButton(icon: "list.bullet.clipboard", tab: .lists, selectedTab: $selectedTab)
+            TabBarButton(icon: "list.bullet.clipboard", isSelected: selectedTab == .lists) {
+                selectTab(.lists)
+            }
             Spacer()
-            TabBarButton(icon: "person", tab: .settings, selectedTab: $selectedTab)
+            TabBarButton(icon: "person", isSelected: selectedTab == .settings) {
+                selectTab(.settings)
+            }
         }
         .padding(.horizontal, 30)
         .padding(.top, 10)
@@ -38,16 +47,14 @@ struct CustomTabBar: View {
 
 struct TabBarButton: View {
     let icon: String
-    let tab: AppTab
-    @Binding var selectedTab: AppTab
+    let isSelected: Bool
+    let action: () -> Void
     
     var body: some View {
-        Button {
-            selectedTab = tab
-        } label: {
-            Image(systemName: selectedTab == tab ? icon + ".fill" : icon)
+        Button(action: action) {
+            Image(systemName: isSelected ? icon + ".fill" : icon)
                 .font(.system(size: 24))
-                .foregroundColor(selectedTab == tab ? .black : .gray)
+                .foregroundColor(isSelected ? .black : .gray)
         }
     }
 }

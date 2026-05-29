@@ -26,14 +26,21 @@ struct DashboardView: View {
                     }
                     .padding(.horizontal)
 
-                    InventoryModeCard(totalItems: viewModel.items.count)
-                        .padding(.horizontal)
+                    Button {
+                        viewModel.startShoppingMode()
+                    } label: {
+                        ShoppingModeEntryCard(
+                            pendingItems: viewModel.shoppingListCount,
+                            lowStockItems: viewModel.lowStockItems.count
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal)
 
                     // Status Summary Grid
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                         Button {
-                            viewModel.selectedListMode = .shopping
-                            viewModel.selectedTab = .lists
+                            viewModel.startShoppingMode()
                         } label: {
                             StatCard(iconName: "cart", title: "購物清單", value: "\(viewModel.shoppingListCount) 項")
                         }
@@ -97,12 +104,13 @@ struct DashboardView: View {
     }
 }
 
-private struct InventoryModeCard: View {
-    let totalItems: Int
+private struct ShoppingModeEntryCard: View {
+    let pendingItems: Int
+    let lowStockItems: Int
 
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: "shippingbox")
+            Image(systemName: "cart.fill")
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundColor(.white)
                 .frame(width: 60, height: 60)
@@ -110,15 +118,19 @@ private struct InventoryModeCard: View {
                 .cornerRadius(14)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("庫存模式")
+                Text("購物模式")
                     .font(AppTheme.headerFont)
                     .foregroundColor(.white)
-                Text("目前追蹤 \(totalItems) 項家中物品")
+                Text("開始採買 · \(pendingItems) 項待買，\(lowStockItems) 項快用完")
                     .font(AppTheme.captionFont)
                     .foregroundColor(.white.opacity(0.72))
             }
 
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundColor(.white.opacity(0.72))
         }
         .padding(20)
         .background(Color.black)

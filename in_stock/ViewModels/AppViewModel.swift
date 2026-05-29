@@ -6,6 +6,7 @@ import Combine
 class AppViewModel: ObservableObject {
     @Published var selectedTab: AppTab = .home
     @Published var selectedListMode: ListMode = .checklist
+    @Published var isShoppingFocusActive = false
     @Published var currentUser: User = MockData.shared.currentUser
     @Published var spaces: [Space] = MockData.shared.spaces
     @Published var items: [Item] = MockData.shared.items
@@ -106,6 +107,22 @@ class AppViewModel: ObservableObject {
     }
 
     // Shopping list operations
+    func startShoppingMode() {
+        isShoppingFocusActive = true
+        selectedListMode = .shopping
+        selectedTab = .lists
+    }
+
+    func pauseShoppingMode() {
+        isShoppingFocusActive = false
+    }
+
+    func finishShoppingMode() {
+        isShoppingFocusActive = false
+        selectedListMode = .checklist
+        selectedTab = .home
+    }
+
     func toggleShoppingItem(_ id: UUID) {
         if let index = shoppingItems.firstIndex(where: { $0.id == id }) {
             shoppingItems[index].isChecked.toggle()
@@ -131,6 +148,82 @@ class AppViewModel: ObservableObject {
         } else {
             shoppingItems.append(ShoppingListItem(name: trimmedName))
         }
+    }
+
+    func addLowStockItemToShoppingList(_ item: Item) {
+        if let sourceIndex = shoppingItems.firstIndex(where: { $0.sourceItemId == item.id }) {
+            shoppingItems[sourceIndex].quantity += 1
+            shoppingItems[sourceIndex].isChecked = false
+            return
+        }
+
+        if let nameIndex = shoppingItems.firstIndex(where: { namesMatch($0.name, item.name) }) {
+            shoppingItems[nameIndex].quantity += 1
+            shoppingItems[nameIndex].isChecked = false
+            shoppingItems[nameIndex].sourceItemId = item.id
+            return
+        }
+
+        shoppingItems.append(
+            ShoppingListItem(name: item.name, quantity: 1, sourceItemId: item.id)
+        )
+    }
+
+    func isInShoppingList(_ item: Item) -> Bool {
+        shoppingItems.contains { shoppingItem in
+            shoppingItem.sourceItemId == item.id || namesMatch(shoppingItem.name, item.name)
+        }
+    }
+
+    func restockEntriesForCompletedShoppingItems() -> [ShoppingRestockEntry] {
+        shoppingItems
+            .filter(\.isChecked)
+            .map { shoppingItem in
+                let matchedItem = matchedInventoryItem(for: shoppingItem)
+
+                return ShoppingRestockEntry(
+                    id: shoppingItem.id,
+                    name: shoppingItem.name,
+                    quantity: shoppingItem.quantity,
+                    matchedItemId: matchedItem?.id,
+                    spaceId: matchedItem?.spaceId ?? spaces.first?.id,
+                    locationText: matchedItem?.locationText ?? "",
+                    shouldRestock: true
+                )
+            }
+    }
+
+    func restockFromCompletedShoppingItems(_ entries: [ShoppingRestockEntry]) {
+        let restockedEntries = entries.filter(\.shouldRestock)
+
+        for entry in restockedEntries {
+            if let matchedItemId = entry.matchedItemId,
+               let itemIndex = items.firstIndex(where: { $0.id == matchedItemId }) {
+                items[itemIndex].quantity += Double(entry.quantity)
+                items[itemIndex].remainingPercentage = 1
+                items[itemIndex].status = .inStock
+                continue
+            }
+
+            guard let spaceId = entry.spaceId else { continue }
+
+            let newItem = Item(
+                name: entry.name,
+                imageName: "📦",
+                quantity: Double(entry.quantity),
+                unit: "件",
+                remainingPercentage: 1,
+                spaceId: spaceId,
+                locationText: entry.locationText.trimmedForUserInput.isEmpty ? "未分類位置" : entry.locationText.trimmedForUserInput,
+                isConsumable: true,
+                status: .inStock
+            )
+            items.append(newItem)
+        }
+
+        let completedIds = Set(entries.map(\.id))
+        shoppingItems.removeAll { completedIds.contains($0.id) }
+        finishShoppingMode()
     }
 
     func toggleDeclutterTodo(_ id: UUID) {
@@ -175,6 +268,19 @@ class AppViewModel: ObservableObject {
     private func progressText(for rows: [ShoppingListItem]) -> String {
         let checked = rows.filter { $0.isChecked }.count
         return "\(checked) / \(rows.count)"
+    }
+
+    private func matchedInventoryItem(for shoppingItem: ShoppingListItem) -> Item? {
+        if let sourceItemId = shoppingItem.sourceItemId,
+           let sourcedItem = items.first(where: { $0.id == sourceItemId }) {
+            return sourcedItem
+        }
+
+        return items.first { namesMatch($0.name, shoppingItem.name) }
+    }
+
+    private func namesMatch(_ lhs: String, _ rhs: String) -> Bool {
+        lhs.trimmedForUserInput.localizedCaseInsensitiveCompare(rhs.trimmedForUserInput) == .orderedSame
     }
 
 }
