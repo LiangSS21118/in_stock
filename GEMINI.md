@@ -1,34 +1,111 @@
 # Project Overview: in_stock
 
-`in_stock` is a SwiftUI application for iOS/macOS. It is a standard Xcode-managed project using the modern SwiftUI app lifecycle.
+`in_stock` is a SwiftUI iOS app prototype for managing home inventory, expiry reminders, shopping lists, space-based item organization, and decluttering items. The project currently uses mock data and focuses on validating the app information architecture, primary flows, and blueprint-driven UI direction.
 
 ## Main Technologies
+
 - **Language:** Swift
 - **UI Framework:** SwiftUI
-- **Build System:** Xcode (build settings defined in `in_stock.xcodeproj`)
+- **Build System:** Xcode project in `in_stock.xcodeproj`
+- **Data:** In-memory state and mock data from `Data/MockData.swift`
+
+There is currently no backend, database, network layer, real persistence, push notification implementation, camera recognition, or real natural-language parsing.
 
 ## Project Structure
-- `in_stock/`: Contains the main source code.
-    - `in_stockApp.swift`: The entry point of the application.
-    - `ContentView.swift`: The main initial view of the application.
-    - `Assets.xcassets/`: Asset catalogs for images, colors, and icons.
-- `in_stock.xcodeproj/`: Xcode project configuration.
+
+- `in_stock/`: Main application source code.
+  - `in_stockApp.swift`: App entry point. Creates and injects `AuthViewModel` and `AppViewModel`.
+  - `ContentView.swift`: Xcode template view, currently not part of the main flow.
+  - `Views/`: Feature views grouped by area, including `Auth`, `Dashboard`, `Lists`, `Profile`, `Root`, and `Spaces`.
+  - `Components/`: Reusable SwiftUI controls, cards, tab bar, badges, and item UI.
+  - `Models/`: Domain models and enums such as `Item`, `Space`, `AppTab`, and `DeclutterItem`.
+  - `ViewModels/`: Observable state and mock operation logic.
+  - `Data/MockData.swift`: Sample users, spaces, inventory items, shopping list items, declutter items, notifications, and achievements.
+  - `Theme/AppTheme.swift`: Shared colors, fonts, spacing, and view styles.
+  - `Assets.xcassets/`: App icons, accent colors, and image assets.
+- `blueprint/`: Design reference images for the app.
+- `SOURCE_CODE_GUIDE.md`: Architecture, data flow, screen, and technical debt notes.
+- `BLUEPRINT_IMPLEMENTATION_REPORT.md`: Blueprint comparison, completion estimates, gaps, and suggested priorities.
+- `README.md`: User-facing project summary and setup instructions.
+
+## App Flow
+
+`InStockApp` injects `AuthViewModel` and `AppViewModel` into `RootView`.
+
+`RootView` decides between:
+
+- `LoginView` when `AuthViewModel.isLoggedIn` is false.
+- `MainContainerView` when the user is logged in.
+
+`MainContainerView` uses `AppViewModel.selectedTab` and `AppTab` to switch between:
+
+- Dashboard
+- Spaces
+- Add Item
+- Lists
+- Profile
+
+`DeclutterView` and related decluttering screens exist, but the main tab flow currently does not expose a dedicated decluttering tab.
+
+## Current Implementation Notes
+
+- `MockData.shared` is a data factory. Its collections are computed properties and should not be treated as persistent storage.
+- App-wide inventory state lives in `AppViewModel.items`.
+- `Space.items` exists on the model but is not the main source of truth for inventory filtering.
+- Dashboard shopping list counts currently read from mock data instead of shared list state.
+- `ListViewModel` owns list state locally inside `ListView`, so list changes are not app-wide yet.
+- Add item flows are mock implementations: natural language parsing and camera recognition use hardcoded behavior.
+- Several buttons are placeholders, including adding spaces, adding shopping items, adding declutter items, and saving declutter settings.
+- The visual implementation still relies heavily on emoji, SF Symbols, and ASCII placeholders where blueprint images show product stickers or room line art.
 
 ## Building and Running
 
-### Using Xcode
-1. Open `in_stock.xcodeproj` in Xcode.
-2. Select the desired scheme and destination (e.g., iPhone Simulator or My Mac).
-3. Press `Cmd + R` to build and run.
+Open the project in Xcode:
 
-### Using Command Line (xcodebuild)
-To build the project from the terminal:
 ```bash
-xcodebuild -project in_stock.xcodeproj -scheme in_stock -sdk iphonesimulator build
+open in_stock.xcodeproj
 ```
-*Note: You may need to specify the correct destination for the simulator.*
+
+Build from the command line:
+
+```bash
+xcodebuild -project in_stock.xcodeproj -scheme in_stock -destination 'platform=iOS Simulator,name=iPhone 16' build
+```
+
+If `iPhone 16` is unavailable, use an installed simulator name.
+
+Run tests once a test target exists:
+
+```bash
+xcodebuild test -project in_stock.xcodeproj -scheme in_stock -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
+No XCTest target is currently committed.
 
 ## Development Conventions
-- **SwiftUI First:** All UI components should be built using SwiftUI.
-- **Modern Swift:** Leverage modern Swift features and follow [Apple's Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/).
-- **Standard Formatting:** Follow standard Swift formatting conventions (e.g., 4-space indentation).
+
+- Follow standard Swift and SwiftUI conventions with 4-space indentation.
+- Use `PascalCase` for types and `camelCase` for properties, methods, and local variables.
+- Keep SwiftUI views feature-scoped and small.
+- Move shared UI into `Components/`.
+- Move shared colors, fonts, spacing, and card styling into `Theme/AppTheme.swift`.
+- Prefer `struct` views.
+- Use `@StateObject` for view-owned observable models.
+- Use `@EnvironmentObject` for app-wide state injected at the root.
+- Keep sample-only data in `Data/MockData.swift`.
+- Do not introduce secrets, signing credentials, provisioning profiles, or production configuration.
+
+## UI Direction
+
+Follow the blueprint direction documented in `BLUEPRINT_IMPLEMENTATION_REPORT.md`: compact inventory cards, restrained black/white/gray styling, bottom tab navigation, sticker-like item cards, space illustrations, and paper-like checklist screens.
+
+When improving blueprint-facing screens, prioritize:
+
+1. Connecting `DeclutterView` into the main flow.
+2. Moving shopping list state into shared app state.
+3. Filling placeholder add/save actions.
+4. Tightening the add-item confirmation form into a compact row-based layout.
+5. Replacing emoji and ASCII placeholders with real assets in `Assets.xcassets`.
+6. Fixing stale mock dates.
+7. Aligning Profile achievements with the blueprint.
+8. Resetting `AddItemViewModel` after successful add and supporting preselected space entry.
