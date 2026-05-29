@@ -3,7 +3,7 @@ import Foundation
 struct MockData {
     static let shared = MockData()
     
-    let currentUser = User(name: "UserName", email: "user@example.com", avatarName: "person.circle.fill")
+    let currentUser = User(name: "使用者", email: "user@example.com", avatarName: "person.circle.fill")
     
     let kitchenId = UUID()
     let livingRoomId = UUID()

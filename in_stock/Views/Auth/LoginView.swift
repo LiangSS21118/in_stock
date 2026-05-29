@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var viewModel: AuthViewModel
+    @State private var name = ""
     @State private var email = ""
     @State private var password = ""
     
@@ -20,6 +21,7 @@ struct LoginView: View {
                 .padding(.bottom, 40)
                 
                 VStack(spacing: 16) {
+                    AuthTextField(placeholder: "帳號名稱", text: $name)
                     AuthTextField(placeholder: "電子信箱", text: $email)
                     AuthTextField(placeholder: "密碼", text: $password, isSecure: true)
                 }
@@ -31,7 +33,7 @@ struct LoginView: View {
                 }
                 
                 PrimaryButton(title: viewModel.isLoading ? "登入中..." : "登入", action: {
-                    viewModel.login(email: email, password: password)
+                    viewModel.login(name: name, email: email, password: password)
                 }, isDisabled: viewModel.isLoading)
                 
                 NavigationLink {

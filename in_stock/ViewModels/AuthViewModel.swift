@@ -10,17 +10,17 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
-    func login(email: String, password: String) {
+    func login(name: String, email: String, password: String) {
         isLoading = true
         // Mock login delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             self.isLoading = false
-            if !email.isEmpty && !password.isEmpty {
+            if !name.isEmpty && !email.isEmpty && !password.isEmpty {
                 self.isLoggedIn = true
-                self.currentUserName = "UserName"
+                self.currentUserName = name
                 self.currentUserEmail = email
             } else {
-                self.errorMessage = "請輸入有效的信箱與密碼"
+                self.errorMessage = "請輸入完整的使用者資訊"
             }
         }
     }
