@@ -150,9 +150,11 @@ Dashboard 用的 computed properties 也在這裡：
 - `addLowStockItemToShoppingList`：支持 `sourceItemId` 關聯。
 - `restockEntriesForCompletedShoppingItems`：產生回補預覽與自動匹配。
 - `restockFromCompletedShoppingItems`：執行庫存回補與新物品新增。
-- `addDeclutterItem` / `updateDeclutterSettings`
+- `toggleDeclutterTodo`：切換斷捨離待辦。當勾選（isChecked 變為 true）時，會將對應物品從 `declutterItems` 移至 `doneDeclutterItems`，使其出現在成就頁面；取消勾選則會移回。
+- `addDeclutterItem`：建立斷捨離項目並同步新增至待辦清單，使用 `sourceItemId` 保持兩者關聯。
+- `updateDeclutterSettings`
 
-購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、以及購物完畢後的回補流程都經由 `AppViewModel` 方法更新。
+購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、以及購物完畢後的回補流程都經由 `AppViewModel` 方法更新。斷捨離邏輯確保了「正在進行」與「已完成」物品的明確劃分：正在處理的在清單中，已完成的在成就中。
 
 `AddItemViewModel` 管新增物品流程：
 - 輸入文字、品名、數量、單位、到期日、空間、位置、是否耗材、提醒門檻。

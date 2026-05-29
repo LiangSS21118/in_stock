@@ -67,6 +67,8 @@ struct MockData {
 
     var declutterTodos: [ShoppingListItem] {
         [
+            ShoppingListItem(name: "米色大衣", isChecked: false),
+            ShoppingListItem(name: "加濕器", isChecked: false),
             ShoppingListItem(name: "玄關備用傘", isChecked: false),
             ShoppingListItem(name: "重複購買的馬克杯", isChecked: true)
         ]
@@ -89,7 +91,7 @@ struct MockData {
             DeclutterItem(name: "多餘的餐具", imageName: "🍴", locationText: "二手市集", action: .sellSecondHand, reason: "簡約生活"),
             DeclutterItem(name: "壞掉的手錶", imageName: "⌚️", locationText: "垃圾桶", action: .discard, reason: "無法修理"),
             DeclutterItem(name: "不常用的包包", imageName: "👜", locationText: "贈送給朋友", action: .donate, reason: "延續價值"),
-            DeclutterItem(name: "多餘的馬克杯", imageName: "🥛", locationText: "二手店", action: .sellSecondHand, reason: "清空桌面"),
+            DeclutterItem(name: "重複購買的馬克杯", imageName: "🥛", locationText: "二手店", action: .sellSecondHand, reason: "清空桌面"),
             DeclutterItem(name: "舊手機", imageName: "📱", locationText: "回收計畫", action: .discard, reason: "回收利用")
         ]
     }

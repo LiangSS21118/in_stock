@@ -58,6 +58,7 @@ There is currently no backend, database, network layer, real persistence, push n
 - Shopping mode includes a "Soft Focus" state: hiding non-essential UI (segmented control, search) while keeping navigation accessible.
 - Search functionality is enabled in `ListView` and `SpaceView`, allowing real-time filtering of items and shopping list entries.
 - Shopping completed flow uses `ShoppingRestockEntry` to match items; matched items increment inventory quantity and reset remaining percentage to 100%. Unmatched items can be added as new inventory with space/location selection.
+- `DeclutterView` displays items currently being decluttered. When a decluttering task is checked off in the `ChecklistModeView`, the item is moved to `doneDeclutterItems` and appears in the `AchievementView` grid.
 - `AchievementView` displays a grid of `doneDeclutterItems` as sticker cards, celebrating successfully decluttered items.
 - Dashboard shopping card is dynamic, showing "Continue Shopping" when focus is active.
 - Add item flows are mock implementations: natural language parsing and camera recognition use hardcoded behavior with `nextFutureDate` logic to avoid expired dates.

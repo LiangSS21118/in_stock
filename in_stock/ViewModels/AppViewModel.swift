@@ -244,8 +244,27 @@ class AppViewModel: ObservableObject {
     }
 
     func toggleDeclutterTodo(_ id: UUID) {
-        if let index = declutterTodos.firstIndex(where: { $0.id == id }) {
-            declutterTodos[index].isChecked.toggle()
+        guard let index = declutterTodos.firstIndex(where: { $0.id == id }) else { return }
+        
+        declutterTodos[index].isChecked.toggle()
+        
+        // If checked, move the linked DeclutterItem to doneDeclutterItems
+        if declutterTodos[index].isChecked {
+            let todo = declutterTodos[index]
+            if let declutterItemIndex = declutterItems.firstIndex(where: { $0.id == todo.sourceItemId || $0.name == todo.name }) {
+                var completedItem = declutterItems[declutterItemIndex]
+                completedItem.createdAt = Date() // Mark as finished now
+                doneDeclutterItems.insert(completedItem, at: 0)
+                declutterItems.remove(at: declutterItemIndex)
+            }
+        } else {
+            // If unchecked, move it back to active (optional, but good for prototype)
+            let todo = declutterTodos[index]
+            if let doneIndex = doneDeclutterItems.firstIndex(where: { $0.id == todo.sourceItemId || $0.name == todo.name }) {
+                let activeItem = doneDeclutterItems[doneIndex]
+                declutterItems.append(activeItem)
+                doneDeclutterItems.remove(at: doneIndex)
+            }
         }
     }
 
@@ -264,7 +283,7 @@ class AppViewModel: ObservableObject {
             reason: trimmedReason
         )
         declutterItems.append(newItem)
-        declutterTodos.append(ShoppingListItem(name: trimmedName))
+        declutterTodos.append(ShoppingListItem(name: trimmedName, sourceItemId: newItem.id))
     }
 
     func updateDeclutterSettings(

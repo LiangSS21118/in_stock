@@ -114,14 +114,14 @@ Reference: `blueprint/05-declutter-profile.png`
 目前實作：
 - `DeclutterView`、`DeclutterDetailView`、`DeclutterSettingsView` 功能完整。
 - `ProfileView` 提供帳戶設定入口。
-- `AchievementView` 已實作：展示一個展示 `doneDeclutterItems`（已成功斷捨離項目）的貼紙卡 grid，並配有 ASCII 獎盃。
+- 邏輯優化：`DeclutterView` 現在僅展示「正在進行中」的斷捨離物品。當用戶在清單中勾選完成後，物品會自動移至 `doneDeclutterItems`。
+- `AchievementView` 已實作：展示已成功斷捨離物品的貼紙卡 grid，達成「成就清單」的語意。
 - `StatusBadge` 可呈現捐贈、二手出售、丟棄狀態。
 
 主要偏差：
 - 斷捨離清單目前使用 emoji，不是照片。
-- 成就頁面目前優先展示具體的已完成項目（貼紙卡），而非純統計數字，這比設計稿更具儀式感，但也屬視覺偏差。
 
-完成度：**約 80%**。主要流程已補上，剩餘工作為視覺細節與實物照片替換。
+完成度：**約 85%**。主要流程與邏輯已完全補齊，剩餘工作為視覺細節與實物照片替換。
 
 ## 視覺完成度總評
 
