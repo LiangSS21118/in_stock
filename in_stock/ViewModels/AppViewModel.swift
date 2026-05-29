@@ -30,7 +30,7 @@ class AppViewModel: ObservableObject {
     }
     
     var declutterTodoCount: Int {
-        declutterItems.count
+        declutterTodos.filter { !$0.isChecked }.count
     }
 
     var shoppingProgress: String {

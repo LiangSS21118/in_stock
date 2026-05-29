@@ -129,8 +129,8 @@ Dashboard 用的 computed properties 也在這裡：
 
 - `lowStockItems`
 - `expiringSoonItems`
-- `shoppingListCount`
-- `declutterTodoCount`
+- `shoppingListCount`：計算購物清單中尚未勾選的項目。
+- `declutterTodoCount`：計算斷捨離待辦中尚未勾選的項目。
 - `shoppingProgress`
 - `declutterProgress`
 
@@ -150,7 +150,7 @@ Dashboard 用的 computed properties 也在這裡：
 - `addDeclutterItem`
 - `updateDeclutterSettings`
 
-購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的購物清單數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、新增品項都經由 `AppViewModel` 方法更新，不讓 View 直接持有第二份清單邏輯。`MockData.shared` 仍只負責提供初始資料。
+購物清單與斷捨離待辦已收斂到 `AppViewModel`，Dashboard 的統計數字與清單頁會讀同一份 live state。清單與購物模式的勾選、數量調整、新增品項都經由 `AppViewModel` 方法更新，不讓 View 直接持有第二份清單邏輯。`MockData.shared` 仍只負責提供初始資料。
 
 `AddItemViewModel` 管新增物品流程：
 
