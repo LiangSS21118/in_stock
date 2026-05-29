@@ -247,10 +247,10 @@ viewModel.itemsForSpace(space.id)
 
 `ListView` 內建 segmented control，切換：
 
-- 清單模式：購物清單卡、斷捨離待辦卡、建議購入、建議斷捨離。
-- 購物模式：購物清單 row、低庫存快速加入、斷捨離待辦精簡檢視。
-- 柔性專注：購物中隱藏 segmented control 與搜尋入口，保留底部 tab，但暫離前會提示確認。
-- 購物完畢：進入回補確認頁，已匹配項目可回補原庫存，未匹配項目可補空間 / 位置或略過。
+- 清單模式：支援紙張風購物清單與斷捨離待辦卡。新增動態日期顯示與 empty state。建議購入與建議斷捨離項改為可點選加入。
+- 購物模式：支援數量 stepper（已勾選項目會停用調整）、新增品項列、低庫存快速加入。
+- 柔性專注：購物中隱藏 segmented control 與搜尋入口，保留底部 tab。若從 Dashboard 進入會啟動專注狀態，若手動切換則提供「開啟專注模式」捷徑。
+- 購物完畢：在購物模式底部顯示，當有項目勾選時啟用。進入回補確認頁，已匹配項目可回補原庫存，未匹配項目可補空間 / 位置或略過。
 
 清單頁直接使用 `AppViewModel` 的共享清單狀態。購物模式使用 `QuantityStepper`，並透過 `AppViewModel.setShoppingItemQuantity(for:quantity:)` 更新數量，避免 View 直接修改 `shoppingItems` 陣列元素。低庫存快速加入會寫入 `ShoppingListItem.sourceItemId`，同來源或同名品項會改為增量，不重複新增列。斷捨離待辦卡與購物模式底部都可進入 `DeclutterView`。
 

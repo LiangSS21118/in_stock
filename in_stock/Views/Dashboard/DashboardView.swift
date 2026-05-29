@@ -30,6 +30,7 @@ struct DashboardView: View {
                         viewModel.startShoppingMode()
                     } label: {
                         ShoppingModeEntryCard(
+                            isActive: viewModel.isShoppingFocusActive,
                             pendingItems: viewModel.shoppingListCount,
                             lowStockItems: viewModel.lowStockItems.count
                         )
@@ -105,12 +106,13 @@ struct DashboardView: View {
 }
 
 private struct ShoppingModeEntryCard: View {
+    let isActive: Bool
     let pendingItems: Int
     let lowStockItems: Int
 
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: "cart.fill")
+            Image(systemName: isActive ? "cart.fill.badge.minus" : "cart.fill")
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundColor(.white)
                 .frame(width: 60, height: 60)
@@ -118,10 +120,10 @@ private struct ShoppingModeEntryCard: View {
                 .cornerRadius(14)
 
             VStack(alignment: .leading, spacing: 6) {
-                Text("購物模式")
+                Text(isActive ? "繼續採買" : "購物模式")
                     .font(AppTheme.headerFont)
                     .foregroundColor(.white)
-                Text("開始採買 · \(pendingItems) 項待買，\(lowStockItems) 項快用完")
+                Text(isActive ? "採買中 · \(pendingItems) 項待買" : "開始採買 · \(pendingItems) 項待買，\(lowStockItems) 項快用完")
                     .font(AppTheme.captionFont)
                     .foregroundColor(.white.opacity(0.72))
             }

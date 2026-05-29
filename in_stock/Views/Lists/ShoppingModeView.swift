@@ -110,26 +110,31 @@ struct ShoppingModeView: View {
                     .foregroundColor(AppTheme.secondaryText)
             }
 
-            Divider()
+            if viewModel.declutterTodos.isEmpty {
+                Text("目前沒有斷捨離待辦")
+                    .font(AppTheme.bodyFont)
+                    .foregroundColor(AppTheme.secondaryText)
+                    .padding(.vertical, 8)
+            } else {
+                ForEach(viewModel.declutterTodos) { item in
+                    Button {
+                        viewModel.toggleDeclutterTodo(item.id)
+                    } label: {
+                        HStack(spacing: 12) {
+                            Image(systemName: item.isChecked ? "checkmark.square.fill" : "square")
+                                .font(.system(size: 22))
+                                .foregroundColor(item.isChecked ? AppTheme.primaryText : AppTheme.secondaryText)
 
-            ForEach(viewModel.declutterTodos) { item in
-                Button {
-                    viewModel.toggleDeclutterTodo(item.id)
-                } label: {
-                    HStack(spacing: 12) {
-                        Image(systemName: item.isChecked ? "checkmark.square.fill" : "square")
-                            .font(.system(size: 22))
-                            .foregroundColor(item.isChecked ? AppTheme.primaryText : AppTheme.secondaryText)
+                            Text(item.name)
+                                .font(AppTheme.bodyFont)
+                                .strikethrough(item.isChecked)
+                                .foregroundColor(item.isChecked ? AppTheme.secondaryText : AppTheme.primaryText)
 
-                        Text(item.name)
-                            .font(AppTheme.bodyFont)
-                            .strikethrough(item.isChecked)
-                            .foregroundColor(item.isChecked ? AppTheme.secondaryText : AppTheme.primaryText)
-
-                        Spacer()
+                            Spacer()
+                        }
                     }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
 
             NavigationLink(destination: DeclutterView(viewModel: viewModel)) {

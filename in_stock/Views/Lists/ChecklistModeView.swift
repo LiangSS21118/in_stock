@@ -6,19 +6,37 @@ struct ChecklistModeView: View {
     var body: some View {
         VStack(spacing: 24) {
             // Shopping Checklist Card
-            PaperChecklistCard(title: "購物清單", dateString: "26/04/17", progressText: viewModel.shoppingProgress) {
-                ForEach(viewModel.shoppingItems) { item in
-                    ChecklistRow(title: item.name, isChecked: item.isChecked) {
-                        viewModel.toggleShoppingItem(item.id)
+            PaperChecklistCard(
+                title: "購物清單",
+                dateString: AppDateFormatter.shortMonthDayString(from: Date()),
+                progressText: viewModel.shoppingProgress
+            ) {
+                if viewModel.shoppingItems.isEmpty {
+                    Text("清單目前為空")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                        .padding(.vertical, 8)
+                } else {
+                    ForEach(viewModel.shoppingItems) { item in
+                        ChecklistRow(title: item.name, isChecked: item.isChecked) {
+                            viewModel.toggleShoppingItem(item.id)
+                        }
                     }
                 }
             }
             
             // Declutter Todo Card
             PaperChecklistCard(title: "斷捨離待辦", progressText: viewModel.declutterProgress) {
-                ForEach(viewModel.declutterTodos) { item in
-                    ChecklistRow(title: item.name, isChecked: item.isChecked) {
-                        viewModel.toggleDeclutterTodo(item.id)
+                if viewModel.declutterTodos.isEmpty {
+                    Text("沒有待辦項目")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                        .padding(.vertical, 8)
+                } else {
+                    ForEach(viewModel.declutterTodos) { item in
+                        ChecklistRow(title: item.name, isChecked: item.isChecked) {
+                            viewModel.toggleDeclutterTodo(item.id)
+                        }
                     }
                 }
 
@@ -39,9 +57,15 @@ struct ChecklistModeView: View {
                 SectionHeader(title: "建議購入")
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
-                        SuggestionItemView(image: "🥛", name: "牛奶")
-                        SuggestionItemView(image: "🥚", name: "雞蛋")
-                        SuggestionItemView(image: "🧴", name: "洗髮精")
+                        SuggestionItemView(image: "🥛", name: "牛奶") {
+                            viewModel.addShoppingItem(name: "牛奶")
+                        }
+                        SuggestionItemView(image: "🥚", name: "雞蛋") {
+                            viewModel.addShoppingItem(name: "雞蛋")
+                        }
+                        SuggestionItemView(image: "🧴", name: "洗髮精") {
+                            viewModel.addShoppingItem(name: "洗髮精")
+                        }
                     }
                 }
             }
@@ -49,9 +73,15 @@ struct ChecklistModeView: View {
             VStack(alignment: .leading, spacing: 16) {
                 SectionHeader(title: "建議斷捨離")
                 VStack(spacing: 12) {
-                    SuggestionRow(name: "玄關備用傘", reason: "重複擁有")
-                    SuggestionRow(name: "重複馬克杯", reason: "很少使用")
-                    SuggestionRow(name: "久未使用毛巾", reason: "不再喜歡")
+                    SuggestionRow(name: "玄關備用傘", reason: "重複擁有") {
+                        viewModel.addDeclutterItem(name: "玄關備用傘", locationText: "玄關", action: .donate)
+                    }
+                    SuggestionRow(name: "重複馬克杯", reason: "很少使用") {
+                        viewModel.addDeclutterItem(name: "重複馬克杯", locationText: "廚房", action: .donate)
+                    }
+                    SuggestionRow(name: "久未使用毛巾", reason: "不再喜歡") {
+                        viewModel.addDeclutterItem(name: "久未使用毛巾", locationText: "浴室", action: .discard)
+                    }
                 }
             }
         }
@@ -82,34 +112,44 @@ struct ChecklistRow: View {
 struct SuggestionItemView: View {
     let image: String
     let name: String
+    let action: () -> Void
+
     var body: some View {
-        VStack(spacing: 8) {
-            Text(image).font(.system(size: 30))
-            Text(name).font(AppTheme.captionFont.bold())
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Text(image).font(.system(size: 30))
+                Text(name).font(AppTheme.captionFont.bold())
+            }
+            .frame(width: 80, height: 80)
+            .background(Color.white)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1))
         }
-        .frame(width: 80, height: 80)
-        .background(Color.white)
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1))
+        .buttonStyle(.plain)
     }
 }
 
 struct SuggestionRow: View {
     let name: String
     let reason: String
+    let action: () -> Void
+
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(name).font(AppTheme.bodyFont.bold())
-                Text(reason).font(AppTheme.captionFont).foregroundColor(.gray)
+        Button(action: action) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(name).font(AppTheme.bodyFont.bold())
+                    Text(reason).font(AppTheme.captionFont).foregroundColor(.gray)
+                }
+                Spacer()
+                Image(systemName: "plus")
+                    .foregroundColor(.gray)
             }
-            Spacer()
-            Image(systemName: "plus")
-                .foregroundColor(.gray)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(12)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1))
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(AppTheme.borderColor, lineWidth: 1))
+        .buttonStyle(.plain)
     }
 }

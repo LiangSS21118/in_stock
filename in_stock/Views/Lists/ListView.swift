@@ -58,6 +58,27 @@ struct ListView: View {
                                 .stroke(AppTheme.borderColor, lineWidth: 1)
                                 .padding(.horizontal)
                         )
+                        
+                        if viewModel.selectedListMode == .shopping && !viewModel.isShoppingFocusActive {
+                            Button {
+                                viewModel.startShoppingMode()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "bolt.fill")
+                                    Text("開啟專注購物模式")
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                }
+                                .font(AppTheme.captionFont.bold())
+                                .foregroundColor(.white)
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 16)
+                                .background(Color.black)
+                                .cornerRadius(10)
+                            }
+                            .padding(.horizontal)
+                            .padding(.top, -8)
+                        }
                     }
                 }
                 .padding(.vertical, 20)
@@ -74,12 +95,12 @@ struct ListView: View {
                 }
                 .background(AppTheme.backgroundColor)
 
-                if viewModel.isShoppingFocusActive {
+                if viewModel.selectedListMode == .shopping {
                     VStack(spacing: 0) {
                         Divider()
-                        PrimaryButton(title: "購物完畢") {
+                        PrimaryButton(title: "購物完畢", action: {
                             isShowingRestockConfirmation = true
-                        }
+                        }, isDisabled: viewModel.shoppingItems.filter(\.isChecked).isEmpty)
                         .padding(.horizontal)
                         .padding(.top, 12)
                         .padding(.bottom, 16)

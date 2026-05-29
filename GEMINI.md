@@ -54,8 +54,9 @@ There is currently no backend, database, network layer, real persistence, push n
 - App-wide inventory state lives in `AppViewModel.items`.
 - Space-to-item ownership is represented only by `Item.spaceId`; `Space` stores display metadata and placeholder artwork, not a second item array.
 - Dashboard, checklist mode, and shopping mode all read shared list state from `AppViewModel`.
-- Shopping-mode row actions and quantity adjustments go through `AppViewModel` methods to maintain a single source of truth.
+- Shopping-mode row actions and quantity adjustments go through `AppViewModel` methods; quantity adjustment is disabled for checked items.
 - Shopping completed flow uses `ShoppingRestockEntry` to match items; matched items increment inventory quantity and reset remaining percentage to 100%.
+- Dashboard shopping card is dynamic, showing "Continue Shopping" when focus is active.
 - Add item flows are mock implementations: natural language parsing and camera recognition use hardcoded behavior with `nextFutureDate` logic to avoid expired dates.
 - Adding spaces, shopping items, declutter items, and declutter settings all have mock state updates using `String.trimmedForUserInput`.
 - Date strings should use `AppDateFormatter`; form empty checks should use `String.trimmedForUserInput`.
